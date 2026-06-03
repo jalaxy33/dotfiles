@@ -1,0 +1,5 @@
+# ~/.config/uv/uv.toml or /etc/uv/uv.toml
+
+[[index]]
+url = "https://mirrors.cloud.tencent.com/pypi/simple/"
+default = true

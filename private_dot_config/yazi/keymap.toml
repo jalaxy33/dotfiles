@@ -1,0 +1,8 @@
+# ~/.config/yazi/keymap.toml
+
+# lazygit
+#   ya pkg add yazi-rs/plugins:git
+[[mgr.prepend_keymap]]
+on   = [ "g", "l" ]
+run  = "plugin lazygit"
+desc = "run lazygit"
