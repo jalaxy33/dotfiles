@@ -1,6 +1,7 @@
 # My dotfiles
 
-Some of my config dotfiles. Managed by [chezmoi](https://www.chezmoi.io/).
+Some of my dotfiles. Managed by [chezmoi](https://www.chezmoi.io/).
+
 
 ## Usage
 
@@ -40,3 +41,4 @@ Some of my config dotfiles. Managed by [chezmoi](https://www.chezmoi.io/).
   git commit -m "<commit messages>"
   git push
   ```
+
