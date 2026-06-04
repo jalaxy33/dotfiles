@@ -1,0 +1,11 @@
+# ~/.config/helix/languages.toml
+
+# rust
+[[language]]
+name = "rust"
+formatter = { command = "rustfmt" }
+
+# python
+[language-server.ruff]
+command = "ruff"
+args = ["server"]

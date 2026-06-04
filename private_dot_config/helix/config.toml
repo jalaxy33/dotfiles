@@ -1,0 +1,11 @@
+# ~/.config/helix/config.toml
+
+[keys.normal]
+"S-A-f" = ":format"
+
+[keys.insert]
+"S-A-f" = ":format"
+
+[editor.soft-wrap]
+enable = true
+
