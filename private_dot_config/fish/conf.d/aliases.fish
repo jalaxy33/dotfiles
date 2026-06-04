@@ -16,6 +16,7 @@ abbr fa fastfetch
 abbr lg lazygit
 abbr reboot 'systemctl reboot'
 abbr grub 'sudo grub-mkconfig -o /boot/grub/grub.cfg'
+abbr cc claude
 
 # configs shortcuts
 set BASH_CONFIG "$HOME/.bashrc"
