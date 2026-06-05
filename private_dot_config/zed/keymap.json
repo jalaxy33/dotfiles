@@ -1,0 +1,74 @@
+// ~/.config/zed/keymap.json
+//
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      // "shift shift": "file_finder::Toggle"
+    },
+  },
+  {
+    "context": "Editor && vim_mode == insert",
+    "bindings": {
+      // "j k": "vim::NormalBefore"
+    },
+  },
+
+  //-- Delete conflict keybindings
+  {
+    "context": "VimControl && !menu",
+    "unbind": {
+      "ctrl-b": "vim::PageUp",
+    },
+  },
+  {
+    "context": "!Terminal",
+    "unbind": {
+      "ctrl-shift-c": "collab_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "Editor && extension == md",
+    "unbind": {
+      "ctrl-shift-v": "markdown::OpenPreview"
+    }
+  },
+
+  //-- My keybindings
+
+  // Toggle inlay hint
+  {
+    "context": "!AcpThread > Editor && mode == full",
+    "bindings": {
+      "alt-x": "editor::ToggleInlayHints",
+    },
+  },
+  // Save current file (compatible with vim mode)
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-s": "workspace::Save",
+    },
+  },
+  // Copy
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-shift-c": "editor::Copy"
+    }
+  },
+  // Search selected in vim mode
+  {
+    "context": "Editor && vim_mode != insert",
+    "bindings": {
+      "/": "vim::SearchUnderCursorPrevious"
+    }
+  }
+]
