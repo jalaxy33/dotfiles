@@ -26,5 +26,6 @@ set -x GOPROXY "https://mirrors.tencent.com/go/"
 if test -d /opt/libtorch
     set -x LIBTORCH /opt/libtorch
     set -x LD_LIBRARY_PATH "$LIBTORCH/lib" $LD_LIBRARY_PATH
+    set -x LIBTORCH_BYPASS_VERSION_CHECK "1"
 end
 
