@@ -18,6 +18,12 @@ Some of my dotfiles. Managed by [chezmoi](https://www.chezmoi.io/).
   chezmoi update
   ```
 
+- Update certain config file, for example:
+
+  ```sh
+  chezmoi apply ~/.bashrc
+  ```
+
 ### Sync with local changes
 
 - Manage new configs:
