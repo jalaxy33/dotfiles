@@ -20,13 +20,3 @@ export RUSTUP_UPDATE_ROOT="https://mirrors.cernet.edu.cn/rustup/rustup"
 
 # go
 export GOPROXY="https://mirrors.tencent.com/go/"
-
-#
-#-- libs
-#
-# libtorch
-if [ -d /opt/libtorch ]; then
-    export LIBTORCH="/opt/libtorch"
-    export LD_LIBRARY_PATH="$LIBTORCH/lib/":$LD_LIBRARY_PATH
-    export LIBTORCH_BYPASS_VERSION_CHECK="1"
-fi
