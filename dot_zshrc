@@ -49,7 +49,7 @@ fi
 #-- try to activate homebrew
 #
 BREW_CMD="/home/linuxbrew/.linuxbrew/bin/brew"
-[[ -x $BREW_CMD ]] && eval "$(BREW_CMD shellenv)"
+[[ -x $BREW_CMD ]] && eval "$($BREW_CMD shellenv)"
 
 #
 #-- Init apps
