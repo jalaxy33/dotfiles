@@ -9,7 +9,6 @@
 # editor aliases
 alias vi='vim'
 alias nv='nvim'
-alias hx='helix'
 
 # command abbrs
 abbr fa fastfetch
@@ -51,6 +50,11 @@ end
 # zed
 if command -q zeditor; and not command -q zed
     alias zed='zeditor --classic'
+end
+
+# helix
+if command -q helix; and not command -q hx
+    alias hx="helix"
 end
 
 #
