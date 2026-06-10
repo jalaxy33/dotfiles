@@ -24,7 +24,6 @@ alias l='ls -CF'
 # editor aliases
 alias vi="vim"
 alias nv="nvim"
-alias hx="helix"
 
 # command abbrs
 alias fa="fastfetch"
@@ -66,6 +65,10 @@ fi
 # zed
 if command_exists zeditor && ! command_exists zed; then
     alias zed='zeditor --classic'
+fi
+
+if command_exists helix && ! command_exists hx; then
+    alias hx="helix"
 fi
 
 #
