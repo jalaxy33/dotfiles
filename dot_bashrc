@@ -57,6 +57,7 @@ command_exists fzf && eval "$(fzf --bash)"
 
 # config yazi
 y() {
+    command_exists yazi || return 1
     local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
     command yazi "$@" --cwd-file="$tmp"
     IFS= read -r -d '' cwd <"$tmp"
