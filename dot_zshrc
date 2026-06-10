@@ -1,8 +1,11 @@
 # ~/.zshrc
 #
 # Necessary:
-#  - zsh, zimfw, vim(or gvim)
+#  - zsh, vim(or gvim)
 #  - zoxide, fzf, eza, yazi, lazygit, jq
+#
+# Beautify:
+#  - zimfw or starship
 #
 # Optional but useful:
 #  - bat, helix, rsync, neovim, fastfetch, lazygit, jujutsu, task
@@ -26,32 +29,47 @@ SCRIPTS_DIR="$HOME/.bash/bin/"
 [[ -f ~/.env ]] && load_dotenv
 
 #
-#-- init zimfw
+#-- init zimfw or starship
 #
-SYSTEM_ZIMFW_ZSH="/usr/share/zimfw/zimfw.zsh"
-BREW_ZIMFW_ZSH="/home/linuxbrew/.linuxbrew/opt/zimfw/share/zimfw.zsh"
+USE_ZIMFW="true" # true | false
+if [[ $USE_ZIMFW == "true" ]]; then
+    #-- use zimfw
 
-local ZIMFW_SCRIPT=""
-if [[ -f $BREW_ZIMFW_ZSH ]]; then
-    ZIMFW_SCRIPT=$BREW_ZIMFW_ZSH
-elif [[ -f $SYSTEM_ZIMFW_ZSH ]]; then
-    ZIMFW_SCRIPT=$SYSTEM_ZIMFW_ZSH
-fi
+    # decide which zimfw to use: system-wise or homebrew
+    # default: homebrew zimfw
+    SYSTEM_ZIMFW_ZSH="/usr/share/zimfw/zimfw.zsh"
+    BREW_ZIMFW_ZSH="/home/linuxbrew/.linuxbrew/opt/zimfw/share/zimfw.zsh"
 
-if [[ -f $ZIMFW_SCRIPT ]]; then
-    [[ ! -f $HOME/.zimrc ]] && echo "Warning: $HOME/.zimrc not exist!"
-
-    ZIM_HOME=${ZDOTDIR:-${HOME}}/.zim
-    # Install missing modules and update ${ZIM_HOME}/init.zsh if missing or outdated.
-    if [[ ! ${ZIM_HOME}/init.zsh -nt ${ZIM_CONFIG_FILE:-${ZDOTDIR:-${HOME}}/.zimrc} ]]; then
-        source $ZIMFW_SCRIPT init
+    local ZIMFW_SCRIPT=""
+    if [[ -f $BREW_ZIMFW_ZSH ]]; then
+        ZIMFW_SCRIPT=$BREW_ZIMFW_ZSH
+    elif [[ -f $SYSTEM_ZIMFW_ZSH ]]; then
+        ZIMFW_SCRIPT=$SYSTEM_ZIMFW_ZSH
     fi
 
-    # Initialize modules.
-    source ${ZIM_HOME}/init.zsh
+    # activate
+    if [[ -f $ZIMFW_SCRIPT ]]; then
+        [[ ! -f $HOME/.zimrc ]] && echo "Warning: $HOME/.zimrc not exist!"
 
-    # Modules configuration
-    ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+        ZIM_HOME=${ZDOTDIR:-${HOME}}/.zim
+        # Install missing modules and update ${ZIM_HOME}/init.zsh if missing or outdated.
+        if [[ ! ${ZIM_HOME}/init.zsh -nt ${ZIM_CONFIG_FILE:-${ZDOTDIR:-${HOME}}/.zimrc} ]]; then
+            source $ZIMFW_SCRIPT init
+        fi
+
+        # Initialize modules.
+        source ${ZIM_HOME}/init.zsh
+
+        # Modules configuration
+        ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+    fi
+else
+    # -- use starship
+    command_exists starship && eval "$(starship init zsh)"
+
+    # fix: command not found: compdef
+    autoload -Uz compinit
+    compinit
 fi
 
 #
@@ -68,6 +86,7 @@ command_exists fzf && source <(fzf --zsh)
 
 # config yazi
 y() {
+    command_exists yazi || return 1
     local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
     command yazi "$@" --cwd-file="$tmp"
     IFS= read -r -d '' cwd <"$tmp"
