@@ -44,6 +44,7 @@ command -q fzf && fzf --fish | source
 
 # config yazi
 function y
+    command -q yazi || return 1
     set tmp (mktemp -t "yazi-cwd.XXXXXX")
     command yazi $argv --cwd-file="$tmp"
     if read -z cwd <"$tmp"; and [ "$cwd" != "$PWD" ]; and test -d "$cwd"
