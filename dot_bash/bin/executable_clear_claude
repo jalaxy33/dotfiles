@@ -22,7 +22,7 @@ cd "$CLAUDE_DIR" || {
 }
 
 # Delete all except explicit keep list (rm_expect is in PATH)
-rm_except -y settings.json config.json .credentials.json plugins skills || {
+rm_except -y settings.json config.json .credentials.json plugins skills hooks || {
     echo "clear_claude: rm_except failed" >&2
     cd "$WORKDIR"
     exit 1
