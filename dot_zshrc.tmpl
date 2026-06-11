@@ -31,7 +31,11 @@ SCRIPTS_DIR="$HOME/.bash/bin/"
 #
 #-- init zimfw or starship
 #
+{{- if eq .chezmoi.username "dai" }}
 USE_ZIMFW="true" # true | false
+{{- else }}
+USE_ZIMFW="false" # true | false
+{{- end }}
 if [[ $USE_ZIMFW == "true" ]]; then
     #-- use zimfw
 
