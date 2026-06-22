@@ -21,8 +21,11 @@ PI_AGENT_DIR="$PI_HOME/agent"
 
 # Step 1: Clean ~/.pi
 if [[ -d "$PI_HOME" ]]; then
-    cd "$PI_HOME" || { echo "clear_pi: failed to cd into $PI_HOME" >&2; exit 1; }
-    "$RM_EXCEPT" -y agent/ extensions/ || {
+    cd "$PI_HOME" || {
+        echo "clear_pi: failed to cd into $PI_HOME" >&2
+        exit 1
+    }
+    "$RM_EXCEPT" -y agent/ web-search.json README.md LICENSE .git/ || {
         echo "clear_pi: rm_except failed in $PI_HOME" >&2
         cd "$ORIG_DIR"
         exit 1
@@ -34,8 +37,11 @@ fi
 
 # Step 2: Clean ~/.pi/agent
 if [[ -d "$PI_AGENT_DIR" ]]; then
-    cd "$PI_AGENT_DIR" || { echo "clear_pi: failed to cd into $PI_AGENT_DIR" >&2; exit 1; }
-    "$RM_EXCEPT" -y auth.json settings.json models.json npm/ || {
+    cd "$PI_AGENT_DIR" || {
+        echo "clear_pi: failed to cd into $PI_AGENT_DIR" >&2
+        exit 1
+    }
+    "$RM_EXCEPT" -y auth.json settings.json models.json mcp.json .gitignore npm/ git/ extensions/ || {
         echo "clear_pi: rm_except failed in $PI_AGENT_DIR" >&2
         cd "$ORIG_DIR"
         exit 1
@@ -43,6 +49,13 @@ if [[ -d "$PI_AGENT_DIR" ]]; then
     cd "$ORIG_DIR"
 else
     echo "clear_pi: $PI_AGENT_DIR not found, skipping" >&2
+fi
+
+# Step 3: clear other folders
+PI_LENS_DIR="$HOME/.pi-lens"
+if [[ -d $PI_LENS_DIR ]]; then
+    echo "Removing $PI_LENS_DIR"
+    rm -rf $PI_LENS_DIR
 fi
 
 echo "clear_pi: Pi history cleared successfully"
