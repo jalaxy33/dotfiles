@@ -31,14 +31,14 @@
   {
     "context": "!Terminal",
     "unbind": {
-      "ctrl-shift-c": "collab_panel::ToggleFocus"
-    }
+      "ctrl-shift-c": "collab_panel::ToggleFocus",
+    },
   },
   {
     "context": "Editor && extension == md",
     "unbind": {
-      "ctrl-shift-v": "markdown::OpenPreview"
-    }
+      "ctrl-shift-v": "markdown::OpenPreview",
+    },
   },
 
   //-- My keybindings
@@ -57,25 +57,32 @@
       "ctrl-s": "workspace::Save",
     },
   },
+  // vscode-style formatting
+  {
+    "context": "Editor",
+    "bindings": {
+      "alt-shift-f": "editor::Format",
+    },
+  },
   // Copy
   {
     "context": "Editor",
     "bindings": {
-      "ctrl-shift-c": "editor::Copy"
-    }
+      "ctrl-shift-c": "editor::Copy",
+    },
   },
   // Search selected in vim mode
   {
     "context": "Editor && vim_mode != insert",
     "bindings": {
-      "/": "vim::SearchUnderCursorPrevious"
-    }
+      "/": "vim::SearchUnderCursorPrevious",
+    },
   },
   // Delete without copy in helix mode
   {
     "context": "(vim_mode == helix_normal || vim_mode == helix_select  || vim_mode == insert || vim_mode == visual) && !menu",
     "bindings": {
-      "alt-c": "vim::HelixSubstituteNoYank"
-    }
-  }
+      "alt-c": "vim::HelixSubstituteNoYank",
+    },
+  },
 ]

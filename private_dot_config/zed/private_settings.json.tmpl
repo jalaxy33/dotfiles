@@ -12,41 +12,21 @@
   // -- AI设置 --
   // 添加自定义模型
   "language_models": {
-    "openai_compatible": {
-      "MiniMax": {
-        "api_url": "https://api.minimaxi.com/v1",
+    "opencode": {
+      "show_zen_models": false,
+    },
+    "anthropic_compatible": {
+      "ZAI": {
+        "api_url": "https://open.bigmodel.cn/api/anthropic",
         "available_models": [
           {
-            "name": "MiniMax-M3",
-            "max_tokens": 200000,
-            "max_output_tokens": 32000,
-            "max_completion_tokens": 200000,
+            "name": "glm-5.2",
+            "display_name": "glm-5.2",
+            "max_tokens": 1000000,
             "capabilities": {
               "tools": true,
               "images": false,
-              "parallel_tool_calls": true,
-              "prompt_cache_key": true,
-              "chat_completions": true,
-              "interleaved_reasoning": false,
-            },
-          },
-        ],
-      },
-      "GLM": {
-        "api_url": "https://open.bigmodel.cn/api/coding/paas/v4",
-        "available_models": [
-          {
-            "name": "glm-5.1",
-            "max_tokens": 200000,
-            "max_output_tokens": 32000,
-            "max_completion_tokens": 200000,
-            "capabilities": {
-              "tools": true,
-              "images": false,
-              "parallel_tool_calls": true,
-              "prompt_cache_key": true,
-              "chat_completions": true,
-              "interleaved_reasoning": false,
+              "prompt_caching": true,
             },
           },
         ],
@@ -64,20 +44,24 @@
     },
   },
   // 设置外部agent ACP
-  // 目前还不太好用
-  "agent_servers": {},
+  "agent_servers": {
+    "pi-acp": {
+      "type": "registry"
+    }
+  },
   // agent面板
   "agent": {
     "inline_assistant_model": {
-      "provider": "GLM",
-      "model": "glm-5.1",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
       "enable_thinking": false,
     },
     "default_profile": "write",
     "default_model": {
-      "provider": "GLM",
-      "model": "glm-5.1",
-      "enable_thinking": false,
+      "effort": "high",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "enable_thinking": true,
     },
     "show_turn_stats": true,
     "notify_when_agent_waiting": "all_screens",
@@ -156,6 +140,19 @@
   },
   "auto_update": false,
   "cli_default_open_behavior": "new_window",
+
+  // -- 编程语言设置 --
+  "languages": {
+    "Markdown-Inline": {
+      "tab_size": 2,
+    },
+    "Markdown": {
+      "tab_size": 2,
+    },
+    "Lua": {
+      "tab_size": 2,
+    },
+  },
 
   // -- 外观主题 --
   "icon_theme": {
