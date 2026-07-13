@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+COMMAND_EXISTS="$SCRIPT_DIR/command_exists"
+
+if [[ ! -x "$COMMAND_EXISTS" ]]; then
+    echo "update_all: error - command_exists not found or not executable at $COMMAND_EXISTS" >&2
+    exit 1
+fi
+
+
+# --- npm & bun ---
+
+if ($COMMAND_EXISTS npm); then
+    echo ""
+    echo "[Running] npm update -g"
+    npm update -g
+    echo "----------------------------------"
+fi
+
+if ($COMMAND_EXISTS bun); then
+    echo ""
+    echo "[Running] bun update -g"
+    bun update -g
+    echo "----------------------------------"
+fi
+
+
+# --- npx skills ---
+
+if ($COMMAND_EXISTS npx); then
+    echo ""
+    echo "[Running] npx skills update -g"
+    npx skills update -g
+    echo "----------------------------------"
+fi
+
