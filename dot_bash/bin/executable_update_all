@@ -1,69 +1,76 @@
 #!/bin/bash
+# update_all - update packages in onces
+# Usage: update_all
 
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMMAND_EXISTS="$SCRIPT_DIR/command_exists"
 
 if [[ ! -x "$COMMAND_EXISTS" ]]; then
-    echo "update_all: error - command_exists not found or not executable at $COMMAND_EXISTS" >&2
-    exit 1
+  echo "update_all: error - command_exists not found or not executable at $COMMAND_EXISTS" >&2
+  exit 1
 fi
-
 
 # --- npm & bun ---
 
 if ($COMMAND_EXISTS npm); then
-    echo ""
-    echo "[Running] npm update -g"
-    npm update -g
-    echo "----------------------------------"
+  echo ""
+  echo "[Running] npm update -g"
+  npm update -g
+  echo "----------------------------------"
 fi
 
 if ($COMMAND_EXISTS bun); then
-    echo ""
-    echo "[Running] bun update -g"
-    bun update -g
-    echo "----------------------------------"
+  echo ""
+  echo "[Running] bun update -g"
+  bun update -g
+  echo "----------------------------------"
 fi
 
 # --- pi ---
 
 if ($COMMAND_EXISTS pi); then
-    echo ""
-    echo "[Running] pi update --all"
-    pi update --all
-    echo "----------------------------------" 
+  echo ""
+  echo "[Running] pi update --all"
+  pi update --all
+  echo "----------------------------------"
 fi
 
 # --- npx skills ---
 
 if ($COMMAND_EXISTS npx); then
-    echo ""
-    echo "[Running] npx skills update -g"
-    npx skills update -g
-    echo "----------------------------------"
+  echo ""
+  echo "[Running] npx skills update -g"
+  npx skills update -g
+  echo "----------------------------------"
 fi
-
 
 # --- rust ---
 
 # update rust toolchain
 if ($COMMAND_EXISTS rustup); then
-    echo ""
-    echo "[Running] rustup update"
-    rustup update
-    echo "----------------------------------"
+  echo ""
+  echo "[Running] rustup update"
+  rustup update
+  echo "----------------------------------"
 fi
 
 # update installed rust binaries using `cargo-update`
-if $COMMAND_EXISTS cargo && ( cargo install --list | grep -q "cargo-update" ); then
-    echo ""
-    echo "[Running] cargo install-update --all"
-    cargo install-update --all
-    echo "----------------------------------"
+if $COMMAND_EXISTS cargo && (cargo install --list | grep -q "cargo-update"); then
+  echo ""
+  echo "[Running] cargo install-update --all"
+  cargo install-update --all
+  echo "----------------------------------"
 fi
 
+# --- flatpak ---
+
+if $COMMAND_EXISTS flatpak; then
+  echo ""
+  echo "[Running] flatpak update"
+  flatpak update
+  echo "----------------------------------"
+fi
 
 echo ""
 echo "[FINISHED] All Updates."
-

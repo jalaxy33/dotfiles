@@ -57,12 +57,12 @@ command_exists fzf && eval "$(fzf --bash)"
 
 # config yazi
 y() {
-    command_exists yazi || return 1
-    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-    command yazi "$@" --cwd-file="$tmp"
-    IFS= read -r -d '' cwd <"$tmp"
-    [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
-    rm -f -- "$tmp"
+  command_exists yazi || return 1
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  command yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd <"$tmp"
+  [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+  rm -f -- "$tmp"
 }
 
 # jujutsu completion
@@ -76,12 +76,12 @@ command_exists jj && source <(COMPLETE=bash jj)
 
 # pnpm
 if [ -d "$HOME/.local/share/pnpm" ]; then
-    export PNPM_HOME="$HOME/.local/share/pnpm"
-    prepend_path "$PNPM_HOME"
+  export PNPM_HOME="$HOME/.local/share/pnpm"
+  prepend_path "$PNPM_HOME"
 fi
 
 # bun
 if [ -d "$HOME/.bun/bin" ]; then
-    export BUN_BIN_DIR="$HOME/.bun/bin"
-    prepend_path "$BUN_BIN_DIR"
+  export BUN_BIN_DIR="$HOME/.bun/bin"
+  prepend_path "$BUN_BIN_DIR"
 fi
