@@ -23,7 +23,7 @@ source "$HOME/.bash/bash_aliases.sh"
 
 # Add `~/.bash/bin/` to PATH, which contains custom commands
 SCRIPTS_DIR="$HOME/.bash/bin/"
-[ -d $SCRIPTS_DIR ] && prepend_path $SCRIPTS_DIR || echo "Warning: $SCIRPTS_DIR not exists!"
+[ -d $SCRIPTS_DIR ] && prepend_path $SCRIP
 
 # load ~/.env
 [[ -f ~/.env ]] && load_dotenv
