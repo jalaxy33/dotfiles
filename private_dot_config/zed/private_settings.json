@@ -112,9 +112,7 @@
 
   // -- 编辑器 --
   "vim_mode": false,
-  {{- if eq .chezmoi.username "dai" }}
   "helix_mode": true,
-  {{- end }}
   "which_key": {
     "delay_ms": 100,
     "enabled": true,
@@ -163,9 +161,7 @@
   "theme": {
     "mode": "dark",
     "light": "Gruvbox Light",
-    {{- if eq .chezmoi.username "dai" }}
     // 需要安装 `Github Theme` 插件
     "dark": "GitHub Dark Dimmed",
-    {{- end }}
   },
 }
