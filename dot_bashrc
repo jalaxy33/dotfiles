@@ -74,6 +74,11 @@ command_exists jj && source <(COMPLETE=bash jj)
 # rust
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 
+# npm
+if [ -d "$HOME/.npm-global/bin" ]; then
+  prepend_path "$HOME/.npm-global/bin"
+fi
+
 # pnpm
 if [ -d "$HOME/.local/share/pnpm" ]; then
   export PNPM_HOME="$HOME/.local/share/pnpm"

@@ -62,6 +62,11 @@ command -q jj && COMPLETE=fish jj | source
 # rust
 test -f "$HOME/.cargo/env.fish" && source "$HOME/.cargo/env.fish"
 
+# npm
+if test -d "$HOME/.npm-global/bin"
+  prepend_path "$HOME/.npm-global/bin"
+end
+
 # pnpm
 if test -d "$HOME/.local/share/pnpm"
     set -gx PNPM_HOME "$HOME/.local/share/pnpm"
