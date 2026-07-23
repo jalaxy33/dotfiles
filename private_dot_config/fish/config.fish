@@ -39,7 +39,7 @@ command -q $BREW_CMD && eval ($BREW_CMD shellenv)
 #-- Init apps
 #
 command -q starship && starship init fish | source
-command -q zoxide && zoxide init fish | source
+command -q zoxide && zoxide init fish --cmd cd | source
 command -q fzf && fzf --fish | source
 
 # config yazi
