@@ -1,2 +1,2 @@
 registry=https://registry.npmmirror.com
-prefix=$HOME/.npm-global
+prefix=${HOME}/.npm-global
