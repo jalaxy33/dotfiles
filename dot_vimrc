@@ -7,11 +7,19 @@ set cursorline
 "语法高亮
 syntax on 
 
-" 开启自动缩进，新的一行会自动与上一行对齐
+" 缩进
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
+" Tab 转成空格
+set expandtab
+" 换行继承上一行缩进
 set autoindent
+" 智能缩进(花括号等)
+set smartindent
+
 " 在输入搜索词时，实时高亮显示匹配项（增量搜索）
 set incsearch
-
 " 高亮显示所有搜索结果
 set hlsearch
 
@@ -37,3 +45,12 @@ set mouse=a
 let g:fcitx5state = 1
 " 当进入普通模式时：记录当前状态，并关闭输入法
 autocmd InsertLeave * let g:fcitx5state = str2nr(system("fcitx5-remote")[0]) | silent call system("fcitx5-remote -c")
+
+" 远程剪贴板同步
+function! s:osc52(text)
+  let b = substitute(system('base64', a:text), '\n', '', '')
+  silent! call writefile(["\e]52;c;".b."\a"], '/dev/fd/2', 'a')
+endfunction
+" yank 后自动同步(含系统寄存器 + 和 y 默认寄存器)
+autocmd TextYankPost * if v:event.operator ==# 'y'
+      \| call s:osc52(join(v:event.regcontents, "\n")) | endif
