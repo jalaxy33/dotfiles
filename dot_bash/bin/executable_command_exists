@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Usage: command_exists <command_name>
 # Returns: 0 if command exists, 1 if not, 2 if argument missing
 
