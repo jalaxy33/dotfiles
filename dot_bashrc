@@ -90,3 +90,7 @@ if [ -d "$HOME/.bun/bin" ]; then
   export BUN_BIN_DIR="$HOME/.bun/bin"
   prepend_path "$BUN_BIN_DIR"
 fi
+
+# haskell
+[ -d "$HOME/.ghcup/bin" ] && prepend_path "$HOME/.ghcup/bin" 
+[ -d "$HOME/.cabal/bin" ] && prepend_path "$HOME/.cabal/bin"

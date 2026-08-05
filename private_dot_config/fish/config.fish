@@ -78,3 +78,7 @@ if test -d "$HOME/.bun/bin"
     set -gx BUN_BIN_DIR "$HOME/.bun/bin"
     prepend_path $BUN_BIN_DIR
 end
+
+# haskell
+test -d "$HOME/.ghcup/bin" && prepend_path "$HOME/.ghcup/bin" 
+test -d "$HOME/.cabal/bin" && prepend_path "$HOME/.cabal/bin"
