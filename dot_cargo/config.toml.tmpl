@@ -20,11 +20,13 @@ index = "https://rsproxy.cn/crates.io-index"
 git-fetch-with-cli = true
 
 
+{{- if (and (eq .chezmoi.os "linux") (and (lookPath "clang") (lookPath "mold"))) }} 
+
 #-- faster linker on linux
 # install `clang` & `mold`
 ## reference: https://bevy.org/learn/quick-start/getting-started/setup/#enable-fast-compiles-optional
 [target.'cfg(target_os = "linux")']
 linker = "clang"
-rustflags = ["-C", "link-arg=-fuse-ld=/usr/bin/mold"]
+rustflags = ["-C", "link-arg=-fuse-ld={{- lookPath "mold" }}"]
 
-
+{{- end }}
