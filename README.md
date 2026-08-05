@@ -12,6 +12,12 @@ Some of my dotfiles. Managed by [chezmoi](https://www.chezmoi.io/).
   chezmoi init --apply jalaxy33
   ```
 
+  Easier sync for CN user:
+
+  ```sh
+  chezmoi init --apply https://gh-proxy.org/https://github.com/jalaxy33/dotfiles
+  ```
+
 - Updating configs on any machine:
 
   ```sh
@@ -87,7 +93,7 @@ Use [template](https://www.chezmoi.io/user-guide/templating/#editing-a-template-
   chezmoi add --template ~/.zshrc
   ```
 
-  If a  file is already managed by chezmoi, but is not a template, you can make it a template by:
+  If a file is already managed by chezmoi, but is not a template, you can make it a template by:
 
   ```sh
   chezmoi chattr +template ~/.zshrc
