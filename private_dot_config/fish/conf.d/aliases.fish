@@ -15,7 +15,7 @@ abbr fa fastfetch
 abbr lg lazygit
 abbr reboot 'systemctl reboot'
 abbr grub 'sudo grub-mkconfig -o /boot/grub/grub.cfg'
-abbr cc claude
+abbr clc claude
 abbr oc opencode
 
 # configs shortcuts
