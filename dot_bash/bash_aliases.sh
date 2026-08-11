@@ -30,7 +30,7 @@ alias fa="fastfetch"
 alias lg="lazygit"
 alias reboot="systemctl reboot"
 alias grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
-alias cc="claude"
+alias clc="claude"
 alias oc="opencode"
 
 # configs shortcuts
