@@ -2,7 +2,7 @@
 #
 # Necessary:
 #  - zsh, vim(or gvim)
-#  - zoxide, fzf, eza, yazi, lazygit, jq
+#  - zoxide, fzf, eza, yazi, lazygit, jq, ripgrep, fd
 #
 # Beautify:
 #  - zimfw or starship

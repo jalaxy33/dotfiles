@@ -9,7 +9,7 @@
 # ## Softwares
 # Necessary:
 #  - fish, starship, vim(or gvim)
-#  - zoxide, fzf, eza, yazi, jq
+#  - zoxide, fzf, eza, yazi, jq, ripgrep, fd
 #
 # Optional but useful:
 #  - bat, helix, rsync, neovim, fastfetch, lazygit, jujutsu, task
