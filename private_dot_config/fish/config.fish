@@ -26,6 +26,10 @@ end
 set SCIRPTS_DIR "$HOME/.bash/bin/"
 test -d $SCIRPTS_DIR && prepend_path "$SCIRPTS_DIR" || echo "Warning: $SCIRPTS_DIR not exists!"
 
+# add `~/.local/bin` to PATH
+set LOCAL_BIN_DIR "$HOME/.local/bin"
+test -d $LOCAL_BIN_DIR && prepend_path $LOCAL_BIN_DIR
+
 # load ~/.env
 test -e ~/.env && load_dotenv
 

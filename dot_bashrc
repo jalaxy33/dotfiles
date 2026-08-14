@@ -19,6 +19,10 @@ source "$HOME/.bash/bash_aliases.sh"
 SCRIPTS_DIR="$HOME/.bash/bin/"
 [ -d $SCRIPTS_DIR ] && prepend_path $SCRIPTS_DIR || echo "Warning: $SCIRPTS_DIR not exists!"
 
+# Add `~/.local/bin` to PATH
+LOCAL_BIN_DIR="$HOME/.local/bin"
+[ -d $LOCAL_BIN_DIR ] && prepend_path $LOCAL_BIN_DIR 
+
 # load ~/.env
 [[ -f ~/.env ]] && load_dotenv
 
