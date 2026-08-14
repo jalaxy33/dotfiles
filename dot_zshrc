@@ -25,6 +25,10 @@ source "$HOME/.bash/bash_aliases.sh"
 SCRIPTS_DIR="$HOME/.bash/bin/"
 [ -d $SCRIPTS_DIR ] && prepend_path $SCRIPTS_DIR || echo "Warning: $SCIRPTS_DIR not exists!"
 
+# Add `~/.local/bin` to PATH
+LOCAL_BIN_DIR="$HOME/.local/bin"
+[ -d $LOCAL_BIN_DIR ] && prepend_path $LOCAL_BIN_DIR
+
 # load ~/.env
 [[ -f ~/.env ]] && load_dotenv
 
@@ -121,7 +125,7 @@ if [ -d "$HOME/.bun/bin" ]; then
 fi
 
 # haskell
-[ -d "$HOME/.ghcup/bin" ] && prepend_path "$HOME/.ghcup/bin" 
+[ -d "$HOME/.ghcup/bin" ] && prepend_path "$HOME/.ghcup/bin"
 [ -d "$HOME/.cabal/bin" ] && prepend_path "$HOME/.cabal/bin"
 
 #
@@ -153,4 +157,3 @@ function nvim_widget() {
 
 zle -N nvim_widget
 bindkey '^[n' nvim_widget
-
