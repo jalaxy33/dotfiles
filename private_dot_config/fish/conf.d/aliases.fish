@@ -62,7 +62,7 @@ end
 #-- alias functions
 #
 function ls
-    command -q eza && command eza --icons --git -a $argv
+    command -q eza && command eza --icons --git -a -g $argv
 end
 
 function rsyncp

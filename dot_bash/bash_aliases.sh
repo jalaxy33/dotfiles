@@ -76,7 +76,7 @@ fi
 #-- alias functions
 #
 function ls() {
-    command_exists eza && eza --icons --git -a "$@"
+    command_exists eza && eza --icons --git -a -g "$@"
 }
 
 rsyncp() {
