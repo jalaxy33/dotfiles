@@ -18,6 +18,9 @@ abbr grub 'sudo grub-mkconfig -o /boot/grub/grub.cfg'
 abbr clc claude
 abbr oc opencode
 
+# history with timestamp
+abbr history 'history --show-time="%Y-%m-%d %H:%M:%S "'
+
 # configs shortcuts
 set BASH_CONFIG "$HOME/.bashrc"
 alias vibash="vi $BASH_CONFIG"
