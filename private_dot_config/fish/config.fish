@@ -12,7 +12,7 @@
 #  - zoxide, fzf, eza, yazi, jq, ripgrep, fd
 #
 # Optional but useful:
-#  - bat, helix, rsync, neovim, fastfetch, lazygit, jujutsu, task
+#  - bat, helix, rsync, neovim, fastfetch, lazygit
 
 if status is-interactive
     # Commands to run in interactive sessions can go here
