@@ -48,5 +48,8 @@ disabled = true
 # reference: https://starship.rs/config/#shell
 [shell]
 fish_indicator = ''
+bash_indicator = '\$'
+zsh_indicator = '%'
 format = '[$indicator]($style)'
-disabled = true
+style = 'green bold'
+disabled = false

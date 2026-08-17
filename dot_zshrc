@@ -16,6 +16,10 @@
 #
 #-- Imports
 #
+# Load configs in `~/.zsh/`
+source "$HOME/.zsh/zsh_functions.sh"
+source "$HOME/.zsh/zsh_keybinds.sh"
+
 # Load configs in `~/.bash/`
 source "$HOME/.bash/bash_functions.sh"
 source "$HOME/.bash/bash_env.sh"
@@ -35,45 +39,17 @@ LOCAL_BIN_DIR="$HOME/.local/bin"
 #
 #-- init zimfw or starship
 #
-USE_ZIMFW="true" # true | false
-if [[ $USE_ZIMFW == "true" ]]; then
+
+USE_ZIMFW="false" # true | false
+if [[ -n $(get_zimfw) && $USE_ZIMFW == "true" ]]; then
   #-- use zimfw
-
-  # decide which zimfw to use: system-wise or homebrew
-  # default: homebrew zimfw
-  SYSTEM_ZIMFW_ZSH="/usr/share/zimfw/zimfw.zsh"
-  BREW_ZIMFW_ZSH="/home/linuxbrew/.linuxbrew/opt/zimfw/share/zimfw.zsh"
-
-  local ZIMFW_SCRIPT=""
-  if [[ -f $BREW_ZIMFW_ZSH ]]; then
-    ZIMFW_SCRIPT=$BREW_ZIMFW_ZSH
-  elif [[ -f $SYSTEM_ZIMFW_ZSH ]]; then
-    ZIMFW_SCRIPT=$SYSTEM_ZIMFW_ZSH
-  fi
-
-  # activate
-  if [[ -f $ZIMFW_SCRIPT ]]; then
-    [[ ! -f $HOME/.zimrc ]] && echo "Warning: $HOME/.zimrc not exist!"
-
-    ZIM_HOME=${ZDOTDIR:-${HOME}}/.zim
-    # Install missing modules and update ${ZIM_HOME}/init.zsh if missing or outdated.
-    if [[ ! ${ZIM_HOME}/init.zsh -nt ${ZIM_CONFIG_FILE:-${ZDOTDIR:-${HOME}}/.zimrc} ]]; then
-      source $ZIMFW_SCRIPT init
-    fi
-
-    # Initialize modules.
-    source ${ZIM_HOME}/init.zsh
-
-    # Modules configuration
-    ZSH_AUTOSUGGEST_MANUAL_REBIND=1
-  fi
+  activate_zimfw
 else
   # -- use starship
   command_exists starship && eval "$(starship init zsh)"
 
   # fix: command not found: compdef
-  autoload -Uz compinit
-  compinit
+  autoload -Uz compinit && compinit
 fi
 
 #
@@ -127,33 +103,3 @@ fi
 # haskell
 [ -d "$HOME/.ghcup/bin" ] && prepend_path "$HOME/.ghcup/bin"
 [ -d "$HOME/.cabal/bin" ] && prepend_path "$HOME/.cabal/bin"
-
-#
-#-- Zsh keybindings
-#
-# Set lazygit keybinding (crtl+g)
-function lazygit_widget() {
-  lazygit
-  zle reset-prompt
-}
-
-zle -N lazygit_widget
-bindkey '^g' lazygit_widget
-
-# Set yazi keybinding (crtl+y)
-function yazi_widget() {
-  y
-  zle reset-prompt
-}
-
-zle -N yazi_widget
-bindkey '^y' yazi_widget
-
-# Set nvim keybinding (alt+n)
-function nvim_widget() {
-  nvim
-  zle reset-prompt
-}
-
-zle -N nvim_widget
-bindkey '^[n' nvim_widget
