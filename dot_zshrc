@@ -19,6 +19,7 @@
 # Load configs in `~/.zsh/`
 source "$HOME/.zsh/zsh_functions.sh"
 source "$HOME/.zsh/zsh_keybinds.sh"
+source "$HOME/.zsh/zsh_aliases.sh"
 
 # Load configs in `~/.bash/`
 source "$HOME/.bash/bash_functions.sh"
