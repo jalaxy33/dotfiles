@@ -9,6 +9,23 @@
 #     https://youtu.be/vFp4IbC2aZ0?si=u5absq9mDC2LkvoS 
 
 
+#--- General Settings ---
+
+
+#-- faster build
+# faster dev build
+[profile.dev]
+debug = "line-tables-only" 
+
+
+#-- Faster Linker
+# install `clang` & `mold`
+### e.g.  sudo pacman -S --needed mold clang 
+[target.'cfg(target_os = "linux")']
+linker = "clang"
+rustflags = ["-C", "link-arg=-fuse-ld=/usr/bin/mold"]
+
+
 
 #--- Nightly Only ---
 #
@@ -32,28 +49,3 @@ rustflags = [
   "-Zshare-generics=y",
 ]
 
-
-#-- Faster Code Generator
-# install `cranelift` (Nightly)
-### rustup component add rustc-codegen-cranelift-preview --toolchain nightly 
-#
-[unstable]
-codegen-backend = true
-
-[profile.dev]
-# switch codegen-backend to cranelift (Nightly)
-codegen-backend = "cranelift"
-# faster dev build (fewer debug info)
-debug = "line-tables-only"
-
-
-[profile.dev.package."*"]
-codegen-backend = "llvm"
-
-
-#-- Faster Linker
-# install `clang` & `mold`
-### e.g.  sudo pacman -S --needed mold clang 
-[target.'cfg(target_os = "linux")']
-linker = "clang"
-rustflags = ["-C", "link-arg=-fuse-ld=/usr/bin/mold"]
