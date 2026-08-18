@@ -1,0 +1,59 @@
+# Rust configs for `nightly` toolchain
+# 
+# Put this at one of:
+#     ~/.cargo/config.toml
+#     <PROJECT_ROOT>/.cargo/config.toml
+#
+# Reference:
+#     https://bevy.org/learn/quick-start/getting-started/setup/#enable-fast-compiles-optional 
+#     https://youtu.be/vFp4IbC2aZ0?si=u5absq9mDC2LkvoS 
+
+
+
+#--- Nightly Only ---
+#
+# Install toolchain:   
+###   rustup toolchain install nightly
+#
+# Build with nightly:
+###   cargo +nightly build 
+#
+# (Optional) Set as default toolchain:
+###   rustup default nightly
+#
+
+
+#-- Set build flags (Nightly)
+[build]
+rustflags = [
+  # (Nightly) parallel type checking
+  "-Zthreads=8",
+  # (Nightly) Make the current crate share its generic instantiations
+  "-Zshare-generics=y",
+]
+
+
+#-- Faster Code Generator
+# install `cranelift` (Nightly)
+### rustup component add rustc-codegen-cranelift-preview --toolchain nightly 
+#
+[unstable]
+codegen-backend = true
+
+[profile.dev]
+# switch codegen-backend to cranelift (Nightly)
+codegen-backend = "cranelift"
+# faster dev build (fewer debug info)
+debug = "line-tables-only"
+
+
+[profile.dev.package."*"]
+codegen-backend = "llvm"
+
+
+#-- Faster Linker
+# install `clang` & `mold`
+### e.g.  sudo pacman -S --needed mold clang 
+[target.'cfg(target_os = "linux")']
+linker = "clang"
+rustflags = ["-C", "link-arg=-fuse-ld=/usr/bin/mold"]
