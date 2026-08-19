@@ -1,5 +1,7 @@
 # Rust configs for `cranelift` code-generator (Nightly Only)
 # 
+# NOTE: the generated code may result in inconsistent behaviors. Please be careful.
+# 
 # Put this at one of:
 #     ~/.cargo/config.toml
 #     <PROJECT_ROOT>/.cargo/config.toml

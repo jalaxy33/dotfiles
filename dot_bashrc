@@ -21,7 +21,7 @@ SCRIPTS_DIR="$HOME/.bash/bin/"
 
 # Add `~/.local/bin` to PATH
 LOCAL_BIN_DIR="$HOME/.local/bin"
-[ -d $LOCAL_BIN_DIR ] && prepend_path $LOCAL_BIN_DIR 
+[ -d $LOCAL_BIN_DIR ] && prepend_path $LOCAL_BIN_DIR
 
 # load ~/.env
 [[ -f ~/.env ]] && load_dotenv
@@ -52,7 +52,8 @@ HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S  "
 #
 #-- try to activate homebrew
 #
-BREW_CMD="/home/linuxbrew/.linuxbrew/bin/brew"
+BREW_PREFIX="/home/linuxbrew/.linuxbrew"
+BREW_CMD="$BREW_PREFIX/bin/brew"
 [[ -f $BREW_CMD ]] && eval "$($BREW_CMD shellenv)"
 
 #
@@ -74,6 +75,28 @@ y() {
 
 # jujutsu completion
 command_exists jj && source <(COMPLETE=bash jj)
+
+# Initialize bash-completion, preferring system-installed version.
+init_bash_completion() {
+  # Only run in interactive shells and avoid reloading.
+  [[ -z $PS1 || -n ${BASH_COMPLETION_VERSINFO:-} ]] && return
+
+  # Candidate paths in priority order (system first).
+  local paths=(
+    "/usr/share/bash-completion/bash_completion"
+    "$BREW_PREFIX/etc/profile.d/bash_completion.sh"
+  )
+
+  local path
+  for path in "${paths[@]}"; do
+    if [[ -f $path ]]; then
+      source "$path"
+      return $? # Return source's exit status.
+    fi
+  done
+  # No completion script found; do nothing.
+}
+init_bash_completion
 
 #
 #-- Language
@@ -99,5 +122,5 @@ if [ -d "$HOME/.bun/bin" ]; then
 fi
 
 # haskell
-[ -d "$HOME/.ghcup/bin" ] && prepend_path "$HOME/.ghcup/bin" 
+[ -d "$HOME/.ghcup/bin" ] && prepend_path "$HOME/.ghcup/bin"
 [ -d "$HOME/.cabal/bin" ] && prepend_path "$HOME/.cabal/bin"
