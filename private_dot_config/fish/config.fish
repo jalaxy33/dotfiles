@@ -36,7 +36,8 @@ test -e ~/.env && load_dotenv
 #
 #-- try to activate homebrew
 #
-set BREW_CMD "/home/linuxbrew/.linuxbrew/bin/brew"
+set BREW_PREFIX "/home/linuxbrew/.linuxbrew"
+set BREW_CMD "$BREW_PREFIX/bin/brew"
 command -q $BREW_CMD && eval ($BREW_CMD shellenv)
 
 #

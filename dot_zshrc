@@ -56,7 +56,8 @@ fi
 #
 #-- try to activate homebrew
 #
-BREW_CMD="/home/linuxbrew/.linuxbrew/bin/brew"
+BREW_PREFIX="/home/linuxbrew/.linuxbrew"
+BREW_CMD="$BREW_PREFIX/bin/brew"
 [[ -x $BREW_CMD ]] && eval "$($BREW_CMD shellenv)"
 
 #
