@@ -41,7 +41,7 @@ LOCAL_BIN_DIR="$HOME/.local/bin"
 #-- init zimfw or starship
 #
 
-USE_ZIMFW="false" # true | false
+USE_ZIMFW="true" # true | false
 if [[ -n $(get_zimfw) && $USE_ZIMFW == "true" ]]; then
   #-- use zimfw
   activate_zimfw
