@@ -12,6 +12,9 @@ set -x HOMEBREW_API_DOMAIN "https://mirrors.ustc.edu.cn/homebrew-bottles/api"
 # set -x HOMEBREW_BOTTLE_DOMAIN "https://mirrors.ustc.edu.cn/homebrew-bottles"
 set -x HOMEBREW_ARTIFACT_DOMAIN "https://mirrors.ustc.edu.cn/homebrew-bottles"
 
+# huggingface
+set -x HF_ENDPOINT "https://hf-mirror.com"
+
 # rust
 set -x RUSTUP_DIST_SERVER "https://rsproxy.cn"
 set -x RUSTUP_UPDATE_ROOT "https://rsproxy.cn/rustup"

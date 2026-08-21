@@ -12,6 +12,9 @@ export HOMEBREW_API_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles/api"
 # export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles"
 export HOMEBREW_ARTIFACT_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles"
 
+# huggingface
+export HF_ENDPOINT="https://hf-mirror.com"
+
 # rust
 export RUSTUP_DIST_SERVER="https://mirrors.cernet.edu.cn/rustup"
 export RUSTUP_UPDATE_ROOT="https://mirrors.cernet.edu.cn/rustup/rustup"
