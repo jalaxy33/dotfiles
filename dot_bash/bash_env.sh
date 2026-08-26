@@ -4,6 +4,17 @@
 #
 
 #
+#-- apps
+#
+# manpage using $EDITOR
+if [ -n "$EDITOR" ] && [[ "$EDITOR" == *vim* || "$EDITOR" == *nv* ]] ; then
+    export MANPAGER="sh -c '$EDITOR +Man!'"
+else
+    unset MANPAGER
+fi
+
+
+#
 #-- mirrors
 #
 # homebrew
