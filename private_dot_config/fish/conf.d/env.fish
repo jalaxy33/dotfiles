@@ -4,6 +4,17 @@
 #
 
 #
+#-- apps
+#
+# manpage using $EDITOR
+if set -q EDITOR[1]; and string match -rq -- 'vim|nv' $EDITOR
+    set -x MANPAGER "sh -c '$EDITOR +Man!'"
+else
+    set -e MANPAGER
+end
+
+
+#
 #-- mirrors
 #
 # homebrew
