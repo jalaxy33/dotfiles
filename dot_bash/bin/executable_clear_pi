@@ -4,67 +4,80 @@
 
 set -euo pipefail
 
+# ==== pre-check ====
+
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RM_EXCEPT="$SCRIPT_DIR/rm_except"
 
+# Save current working directory
+ORIG_DIR="$PWD"
+PI_HOME="$HOME/.pi"
+
+# skip if ~/.pi not exists
+if [[ ! -d $PI_HOME ]]; then
+  echo "$PI_HOME not found! Skipped." >&2
+  exit 1
+fi
+
 # Check rm_except exists and is executable
-if [[ ! -x "$RM_EXCEPT" ]]; then
+if [[ ! -x $RM_EXCEPT ]]; then
   echo "clear_pi: error - rm_except not found or not executable at $RM_EXCEPT" >&2
   exit 1
 fi
 
-# Save current working directory
-ORIG_DIR="$PWD"
-PI_HOME="$HOME/.pi"
+# ==== helper functions ====
+
+# Clean a directory by preserving specified items and deleting everything else
+# Usage: clean_directory <dir> <item1> [item2 ...]
+clean_directory() {
+  local dir="$1"
+  shift              # get rid of first arg (dir)
+  local keeps=("$@") # take the rest of args as the files to keep
+
+  if [[ -d $dir ]]; then
+    echo
+    echo "[CLEANING] $dir"
+    cd "$dir" || {
+      echo "clear_pi: failed to cd into $dir" >&2
+      cd "$ORIG_DIR"
+      exit 1
+    }
+    "$RM_EXCEPT" -y "${keeps[@]}" || {
+      echo "clear_pi: rm_except failed in $dir" >&2
+      cd "$ORIG_DIR"
+      exit 1
+    }
+    cd "$ORIG_DIR"
+  fi
+}
+
+# ==== cleaning ====
+
+#-- Step 1: Clean ~/.pi
+pi_keeps=(
+  agent/ .git/
+  .gitignore README.md LICENSE web-search.json
+)
+clean_directory $PI_HOME "${pi_keeps[@]}"
+
+#-- Step 2: Clean ~/.pi/agent
 PI_AGENT_DIR="$PI_HOME/agent"
+pi_agent_keeps=(
+  npm/ git/ extensions/ pi-blackhole/
+  .gitignore auth.json settings.json models.json keybindings.json models-store.json
+  mcp.json subagents.json multimodal-proxy.json .env
+)
+clean_directory $PI_AGENT_DIR "${pi_agent_keeps[@]}"
 
-# Step 1: Clean ~/.pi
-if [[ -d "$PI_HOME" ]]; then
-  cd "$PI_HOME" || {
-    echo "clear_pi: failed to cd into $PI_HOME" >&2
-    exit 1
-  }
-  "$RM_EXCEPT" -y agent/ web-search.json README.md LICENSE .git/ .gitignore || {
-    echo "clear_pi: rm_except failed in $PI_HOME" >&2
-    cd "$ORIG_DIR"
-    exit 1
-  }
-  cd "$ORIG_DIR"
-else
-  echo "clear_pi: $PI_HOME not found, skipping" >&2
-fi
+#-- Step 3: Clean plugin-specific folders
 
-# Step 2: Clean ~/.pi/agent
-if [[ -d "$PI_AGENT_DIR" ]]; then
-  cd "$PI_AGENT_DIR" || {
-    echo "clear_pi: failed to cd into $PI_AGENT_DIR" >&2
-    exit 1
-  }
-  "$RM_EXCEPT" -y auth.json settings.json models.json mcp.json subagents.json keybindings.json .gitignore npm/ git/ extensions/ multimodal-proxy.json .env pi-blackhole/ || {
-   
-    # clear ~/.pi/agent/pi-blackhole 
-    PI_BLACKHOLE_DIR="$PI_AGENT_DIR/pi-blackhole"
-    if [[ -d $PI_BLACKHOLE_DIR ]]; then
-      cd "$PI_BLACKHOLE_DIR"
-      "$RM_EXCEPT" -y pi-blackhole-config.json
-      cd $PI_AGENT_DIR
-    fi
+# clean ~/.pi/agent/pi-blackhole
+PI_BLACKHOLE_DIR="$PI_AGENT_DIR/pi-blackhole"
+pi_blackhole_keeps=(
+  pi-blackhole-config.json
+)
+clean_directory $PI_BLACKHOLE_DIR "${pi_blackhole_keeps[@]}"
 
-    echo "clear_pi: rm_except failed in $PI_AGENT_DIR" >&2
-    cd "$ORIG_DIR"
-    exit 1
-  }
-  cd "$ORIG_DIR"
-else
-  echo "clear_pi: $PI_AGENT_DIR not found, skipping" >&2
-fi
-
-# Step 3: clear other folders
-PI_LENS_DIR="$HOME/.pi-lens"
-if [[ -d $PI_LENS_DIR ]]; then
-  echo "Removing $PI_LENS_DIR"
-  rm -rf $PI_LENS_DIR
-fi
-
+echo
 echo "clear_pi: Pi history cleared successfully"
