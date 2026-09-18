@@ -10,44 +10,29 @@
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
   // -- AI设置 --
+  // 是否全局禁用AI功能
+  "disable_ai": true,
   // 添加自定义模型
   "language_models": {
     "opencode": {
       "show_zen_models": false,
     },
-    "anthropic_compatible": {
-      "ZAI": {
-        "api_url": "https://open.bigmodel.cn/api/anthropic",
-        "available_models": [
-          {
-            "name": "glm-5.2",
-            "display_name": "glm-5.2",
-            "max_tokens": 1000000,
-            "capabilities": {
-              "tools": true,
-              "images": false,
-              "prompt_caching": true,
-            },
-          },
-        ],
-      },
-    },
   },
   // 设置自动补全模型
   "edit_predictions": {
-    "mode": "eager",
+    "mode": "subtle",
     "provider": "open_ai_compatible_api",
     "open_ai_compatible_api": {
       "prompt_format": "deepseek_coder",
-      "model": "deepseek-v4-flash",
+      "model": "deepseek-flash",
       "api_url": "https://api.deepseek.com/beta/completions",
     },
   },
   // 设置外部agent ACP
   "agent_servers": {
     "pi-acp": {
-      "type": "registry"
-    }
+      "type": "registry",
+    },
   },
   // agent面板
   "agent": {
