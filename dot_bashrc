@@ -109,7 +109,7 @@ init_bash_completion
 init_flyline() {
   local paths=(
     "/usr/lib/bash/libflyline.so"
-    "$BREW_PREFIX/lib/bash/libflyline"
+    "$BREW_PREFIX/lib/bash/flyline"
   )
   
   local path 
