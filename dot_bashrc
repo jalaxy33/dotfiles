@@ -107,8 +107,18 @@ init_bash_completion
 
 # fish-like interactive behavior
 init_flyline() {
-  local flyline_lib="/usr/lib/bash/libflyline.so"
-  enable flyline 2>/dev/null || [[ -f $flyline_lib ]] && enable -f $flyline_lib flyline
+  local paths=(
+    "/usr/lib/bash/libflyline.so"
+    "$BREW_PREFIX/lib/bash/libflyline.lib"
+  )
+  
+  local path 
+  for path in "${paths[@]}"; do
+    if [[ -f $path ]]; then
+      enable -f $path flyline
+      return $? 
+    fi
+  done
 }
 init_flyline
 
