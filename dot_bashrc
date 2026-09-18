@@ -6,6 +6,7 @@
 #
 # Optional but useful:
 #  - bat, helix, rsync, neovim, fastfetch, lazygit
+#  - flyline
 
 #
 #-- Imports
@@ -34,6 +35,12 @@ LOCAL_BIN_DIR="$HOME/.local/bin"
 
 # prompt format
 PS1='[\u@\h \W]\$ '
+
+# auto cd
+shopt -s autocd
+
+# line wrap on window resize
+shopt -s checkwinsize
 
 # history related settings
 ## ignore duplicate lines and space in the history.
@@ -97,6 +104,13 @@ init_bash_completion() {
   # No completion script found; do nothing.
 }
 init_bash_completion
+
+# fish-like interactive behavior
+init_flyline() {
+  local flyline_lib="/usr/lib/bash/libflyline.so"
+  enable flyline 2>/dev/null || [[ -f $flyline_lib ]] && enable -f $flyline_lib flyline
+}
+init_flyline
 
 #
 #-- Language
