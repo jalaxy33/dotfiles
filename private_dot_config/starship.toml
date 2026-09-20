@@ -44,12 +44,14 @@ use_os_path_sep = false
 [container]
 disabled = true
 
-# set `disabled` to false if shell indicated needed
-# reference: https://starship.rs/config/#shell
+
+[character]
+disabled = true
+
+
 [shell]
-fish_indicator = ''
+fish_indicator = '❯'
 bash_indicator = '\$'
 zsh_indicator = '%'
-format = '[$indicator]($style)'
 style = 'green bold'
 disabled = false
