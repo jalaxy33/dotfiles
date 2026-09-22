@@ -20,7 +20,7 @@ if [[ ! -d $PI_HOME ]]; then
   exit 1
 fi
 
-# Check rm_except exists and is executable
+# Check `rm_except` exists and is executable
 if [[ ! -x $RM_EXCEPT ]]; then
   echo "clear_pi: error - rm_except not found or not executable at $RM_EXCEPT" >&2
   exit 1
