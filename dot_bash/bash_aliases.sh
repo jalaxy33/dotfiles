@@ -58,27 +58,34 @@ alias batfish="bat $FISH_CONFIG"
 #
 #-- command aliases
 #
+# shortcuts for rsync
+if command_exists rsync; then
+  alias rsyncp="rsync -alvhP"
+fi
+
 # task
 if command_exists go-task && ! command_exists task; then
-    alias task="go-task"
+  alias task="go-task"
 fi
 
 # zed
 if command_exists zeditor && ! command_exists zed; then
-    alias zed='zeditor --classic'
+  alias zed='zeditor --classic'
 fi
 
+# helix
 if command_exists helix && ! command_exists hx; then
-    alias hx="helix"
+  alias hx="helix"
+fi
+
+# chezmoi for niri dotfiles
+if command_exists chezmoi; then
+  alias nirichezmoi="chezmoi -S ~/.local/share/chezmoi-niri/"
 fi
 
 #
 #-- alias functions
 #
 function ls() {
-    command_exists eza && eza --icons --git -a -g "$@"
-}
-
-rsyncp() {
-    rsync -alvhP "$@"
+  command_exists eza && eza --icons --git -a -g "$@"
 }
