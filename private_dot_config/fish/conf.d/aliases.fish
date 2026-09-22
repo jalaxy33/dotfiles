@@ -46,6 +46,11 @@ alias batfish="bat $FISH_CONFIG"
 #
 #-- command aliases
 #
+# shortcuts for rsync
+if command -q rsync
+    alias rsyncp="rsync -alvhP"
+end
+
 # task
 if command -q go-task; and not command -q task
     alias task='go-task'
@@ -61,13 +66,14 @@ if command -q helix; and not command -q hx
     alias hx="helix"
 end
 
+# chezmoi for niri dotfiles
+if command -q chezmoi
+    alias nirichezmoi="chezmoi -S ~/.local/share/chezmoi-niri/"
+end
+
 #
 #-- alias functions
 #
 function ls
     command -q eza && command eza --icons --git -a -g $argv
-end
-
-function rsyncp
-    command rsync -alvhP $argv
 end
