@@ -1,22 +1,25 @@
-# ~/.bash/bash_env.sh
+#!/usr/bin/env bash
 #
-# Setting environment variables for bash
+# bash_env.sh -- Setting environment variables for bash
 #
 
-#
-#-- apps
-#
+source "$HOME/.bash/bash_functions.sh"
+
+#======================================
+# apps
+#======================================
+
 # manpage using $EDITOR
-if [ -n "$EDITOR" ] && [[ "$EDITOR" == *vim* || "$EDITOR" == *nv* ]] ; then
-    export MANPAGER="sh -c '$EDITOR +Man!'"
+if [ -n "$EDITOR" ] && [[ $EDITOR == *vim* || $EDITOR == *nv* ]]; then
+  export MANPAGER="sh -c '$EDITOR +Man!'"
 else
-    unset MANPAGER
+  unset MANPAGER
 fi
 
+#======================================
+# mirrors
+#======================================
 
-#
-#-- mirrors
-#
 # homebrew
 export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.ustc.edu.cn/brew.git"
 export HOMEBREW_API_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles/api"
@@ -32,3 +35,10 @@ export RUSTUP_UPDATE_ROOT="https://mirrors.cernet.edu.cn/rustup/rustup"
 
 # go
 export GOPROXY="https://mirrors.tencent.com/go/"
+
+#======================================
+# .env
+#======================================
+
+# load ~/.env
+[[ -f ~/.env ]] && load_dotenv

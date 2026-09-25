@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+PROXY_HEAD="https://gh-proxy.org"
+
+DOTFILES_REPO="https://github.com/jalaxy33/dotfiles"
+DOTFILES_PROXY_REPO="$PROXY_HEAD/$DOTFILES_REPO"
+
+NVIM_REPO="https://github.com/jalaxy33/nvim-advent"
+NVIM_PROXY_REPO="$PROXY_HEAD/$NVIM_REPO"
+
+# ==== Helper Funs ====
+
+# command_exists <command_name> -- return 0 if the command is available in $PATH
+command_exists() {
+  [[ $# -eq 1 ]] || {
+    echo "Usage: command_exists <command_name>" >&2
+    return 2
+  }
+  command -v "$1" >/dev/null 2>&1
+}
+
+# confirm <prompt> [y|n] -- yes/no question, bare Enter takes the default
+confirm() {
+  local prompt=$1 default=${2:-y} hint answer
+  if [[ $default == y ]]; then hint="[Y/n]"; else hint="[y/N]"; fi
+  read -r -p "$prompt $hint " answer
+  answer=${answer:-$default}
+  [[ $answer == [Yy]* ]]
+}
+
+# chezmoi_initialized -- true if the source dir is a git repo with an origin remote
+chezmoi_initialized() {
+  local source_dir
+  source_dir=$(chezmoi source-path 2>/dev/null) || return 1
+  [[ -n $source_dir && -d "$source_dir/.git" ]] || return 1
+  git -C "$source_dir" remote get-url origin >/dev/null 2>&1
+}
+
+# ==== Sync Funcs ====
+
+sync_chezmoi() {
+  local source_dir repo_url behind
+
+  # ---- 0. is chezmoi available? ----
+  if ! command_exists chezmoi; then
+    echo "chezmoi is not installed, skipping dotfiles sync." >&2
+    echo "Install it and re-run, e.g.:" >&2
+    echo "  paru -S chezmoi                              # Arch" >&2
+    echo "  brew install chezmoi                         # macOS" >&2
+    echo '  sh -c "$(curl -fsLS get.chezmoi.io)"         # generic' >&2
+    return 1
+  fi
+
+  # ---- already initialized: check for remote changes and apply ----
+  if chezmoi_initialized; then
+    source_dir=$(chezmoi source-path)
+
+    # 'chezmoi diff' cannot see commits that exist only on the remote,
+    # so fetch first and compare with the upstream branch.
+    behind=0
+    if git -C "$source_dir" fetch --quiet origin 2>/dev/null; then
+      behind=$(git -C "$source_dir" rev-list --count 'HEAD..@{u}' 2>/dev/null || echo 0)
+    else
+      echo "[!] 'git fetch origin' failed (offline?); remote state unknown."
+    fi
+
+    if ((behind > 0)); then
+      echo "Remote is $behind commit(s) ahead:"
+      git -C "$source_dir" --no-pager log --oneline 'HEAD..@{u}'
+    fi
+
+    if ((behind == 0)) && [[ -z $(chezmoi diff) ]]; then
+      echo "[OK] Dotfiles are already up to date."
+      return 0
+    fi
+
+    echo ""
+    echo "Pending changes:"
+    chezmoi diff
+
+    if confirm "Apply these changes with 'chezmoi update'?" y; then
+      echo "[Running] chezmoi update"
+      chezmoi update
+    else
+      echo "[Skipped] chezmoi update."
+    fi
+    return 0
+  fi
+
+  # ---- not initialized: offer to clone the dotfiles repo ----
+  echo "[!] chezmoi is installed but not initialized with a dotfiles repo."
+
+  if ! confirm "Clone your dotfiles repo now?" y; then
+    echo "[Skipped] chezmoi init."
+    return 0
+  fi
+
+  repo_url=$DOTFILES_REPO
+  if confirm "Use the proxy URL ($DOTFILES_PROXY_REPO)?" n; then
+    repo_url=$DOTFILES_PROXY_REPO
+  fi
+
+  # a pre-existing non-empty source dir makes 'chezmoi init' fail with git exit 128
+  source_dir=$(chezmoi source-path)
+  if [[ -d $source_dir && -n $(ls -A "$source_dir") ]]; then
+    echo "Error: $source_dir already exists and is not empty." >&2
+    echo "Move it aside first, e.g. mv \"$source_dir\" \"$source_dir.bak\"" >&2
+    return 1
+  fi
+
+  echo "[Running] chezmoi init --apply $repo_url"
+  chezmoi init --apply "$repo_url"
+}
+
+# ==== Run ====
+
+echo
+echo "==== [chezmoi] ===="
+sync_chezmoi

@@ -3,9 +3,10 @@
 # Setting environment variables for fish
 #
 
-#
-#-- apps
-#
+#======================================
+# apps
+#======================================
+
 # manpage using $EDITOR
 if set -q EDITOR[1]; and string match -rq -- 'vim|nv' $EDITOR
     set -x MANPAGER "sh -c '$EDITOR +Man!'"
@@ -14,9 +15,10 @@ else
 end
 
 
-#
-#-- mirrors
-#
+#======================================
+# mirrors
+#======================================
+
 # homebrew
 set -x HOMEBREW_BREW_GIT_REMOTE "https://mirrors.ustc.edu.cn/brew.git"
 set -x HOMEBREW_API_DOMAIN "https://mirrors.ustc.edu.cn/homebrew-bottles/api"
@@ -32,3 +34,12 @@ set -x RUSTUP_UPDATE_ROOT "https://rsproxy.cn/rustup"
 
 # go
 set -x GOPROXY "https://mirrors.tencent.com/go/"
+
+
+#======================================
+# .env
+#======================================
+
+# load ~/.env
+test -e ~/.env && load_dotenv
+

@@ -1,4 +1,7 @@
-# ~/.bash/bash_aliases.sh
+#!/usr/bin/env bash
+#
+# bash_aliases.sh -- command aliases
+#
 
 source "$HOME/.bash/bash_functions.sh"
 
@@ -88,4 +91,13 @@ fi
 #
 function ls() {
   command_exists eza && eza --icons --git -a -g "$@"
+}
+
+y() {
+  command_exists yazi || return 1
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  command yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd <"$tmp"
+  [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+  rm -f -- "$tmp"
 }

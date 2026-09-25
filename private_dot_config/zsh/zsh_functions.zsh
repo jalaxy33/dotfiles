@@ -1,6 +1,6 @@
-# ~/.zsh/zsh_functions.sh
+# zsh_functions.zsh -- zsh specific functions
 
-function get_zimfw() {
+get_zimfw() {
   # decide which zimfw to use: system-wise or homebrew
   # default: homebrew zimfw
   SYSTEM_ZIMFW_ZSH="/usr/share/zimfw/zimfw.zsh"
@@ -16,7 +16,7 @@ function get_zimfw() {
   echo $ZIMFW_SCRIPT
 }
 
-function activate_zimfw() {
+activate_zimfw() {
   ZIMFW_SCRIPT=$(get_zimfw)
 
   # activate
@@ -34,5 +34,10 @@ function activate_zimfw() {
 
     # Modules configuration
     ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+
   fi
+}
+
+is_zimfw_loaded() {
+  whence -w zimfw &>/dev/null
 }
