@@ -71,9 +71,21 @@ if command -q chezmoi
     alias nirichezmoi="chezmoi -S ~/.local/share/chezmoi-niri/"
 end
 
+
 #
 #-- alias functions
 #
 function ls
     command -q eza && command eza --icons --git -a -g $argv
 end
+
+function y
+    command -q yazi || return 1
+    set tmp (mktemp -t "yazi-cwd.XXXXXX")
+    command yazi $argv --cwd-file="$tmp"
+    if read -z cwd <"$tmp"; and [ "$cwd" != "$PWD" ]; and test -d "$cwd"
+        builtin cd -- "$cwd"
+    end
+    rm -f -- "$tmp"
+end
+

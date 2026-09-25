@@ -1,8 +1,12 @@
-# ~/.bash/bash_functions.sh
+#!/usr/bin/env bash
+#
+# bash_functions.sh -- useful functions
+#
 
-#
-#-- helper functions
-#
+# ==========================================
+# Helper Functions
+# ==========================================
+
 # command_exists - check if a command exists
 # Usage: command_exists <command_name>
 # Returns: 0 if command exists, 1 if not, 2 if argument missing
@@ -34,11 +38,11 @@ load_dotenv() {
   local no_override=false
   local has_error=0
 
-  if [[ "$2" == "--no-override" ]]; then
+  if [[ $2 == "--no-override" ]]; then
     no_override=true
   fi
 
-  if [[ ! -f "$file" ]]; then
+  if [[ ! -f $file ]]; then
     echo "load_dotenv: $file not found" >&2
     return 1
   fi
@@ -46,12 +50,12 @@ load_dotenv() {
   # Flag to handle BOM on first line only
   local bom_handled=0
 
-  while IFS= read -r line || [[ -n "$line" ]]; do
+  while IFS= read -r line || [[ -n $line ]]; do
     # ---------- 1. Handle UTF-8 BOM on first line ----------
     if ((bom_handled == 0)); then
       bom_handled=1
       # Remove BOM if present (three bytes: \xEF\xBB\xBF)
-      if [[ "$line" == $'\xEF\xBB\xBF'* ]]; then
+      if [[ $line == $'\xEF\xBB\xBF'* ]]; then
         line="${line:3}"
       fi
     fi
@@ -65,12 +69,12 @@ load_dotenv() {
     line="${line%$trailing}"
 
     # ---------- 3. Skip empty lines and comments ----------
-    if [[ -z "$line" ]] || [[ "$line" == "#"* ]]; then
+    if [[ -z $line ]] || [[ $line == "#"* ]]; then
       continue
     fi
 
     # ---------- 4. Handle optional 'export' prefix ----------
-    if [[ "$line" =~ ^export[[:space:]]+(.*) ]]; then
+    if [[ $line =~ ^export[[:space:]]+(.*) ]]; then
       # Remove 'export' and any following spaces
       line="${line#export}"
       # Trim again (left whitespace)
@@ -79,7 +83,7 @@ load_dotenv() {
     fi
 
     # ---------- 5. Skip lines without '=' ----------
-    if [[ "$line" != *"="* ]]; then
+    if [[ $line != *"="* ]]; then
       echo "load_dotenv: skipping invalid line (no '='): $line" >&2
       has_error=1
       continue
@@ -95,23 +99,23 @@ load_dotenv() {
     local key_trailing="${key##*[![:space:]]}"
     key="${key%$key_trailing}"
 
-    if [[ -z "$key" ]]; then
+    if [[ -z $key ]]; then
       echo "load_dotenv: skipping empty key in line: $line" >&2
       has_error=1
       continue
     fi
 
     # ---------- 7. Strip matching quotes from value ----------
-    if [[ "$value" == \'*\' && "${#value}" -ge 2 ]]; then
+    if [[ $value == \'*\' && ${#value} -ge 2 ]]; then
       # Single quotes
       value="${value:1:${#value}-2}"
-    elif [[ "$value" == \"*\" && "${#value}" -ge 2 ]]; then
+    elif [[ $value == \"*\" && ${#value} -ge 2 ]]; then
       # Double quotes
       value="${value:1:${#value}-2}"
     fi
 
     # ---------- 8. Optionally skip if variable already exists ----------
-    if [[ "$no_override" == true ]] && [[ -n "${!key}" ]]; then
+    if [[ $no_override == true ]] && [[ -n ${!key} ]]; then
       continue
     fi
 
@@ -122,9 +126,10 @@ load_dotenv() {
   return $has_error
 }
 
-#
-#-- proxy functions
-#
+# ==========================================
+# Proxy functions
+# ==========================================
+
 # set_proxy - Set HTTP/HTTPS proxy with optional host and port
 # Usage: set_proxy [host[:port]] [port]
 #   - No args:         default 127.0.0.1:7890
@@ -135,24 +140,24 @@ set_proxy() {
   local port="7890"
 
   case $# in
-  0)
-    ;;
-  1)
-    if [[ "$1" == *:* ]]; then
-      host="${1%:*}"
-      port="${1#*:}"
-    else
+    0)
+      ;;
+    1)
+      if [[ $1 == *:* ]]; then
+        host="${1%:*}"
+        port="${1#*:}"
+      else
+        host="$1"
+      fi
+      ;;
+    2)
       host="$1"
-    fi
-    ;;
-  2)
-    host="$1"
-    port="$2"
-    ;;
-  *)
-    echo "Usage: set_proxy [host[:port]] [port]" >&2
-    return 1
-    ;;
+      port="$2"
+      ;;
+    *)
+      echo "Usage: set_proxy [host[:port]] [port]" >&2
+      return 1
+      ;;
   esac
 
   local proxy_url="$host:$port"
@@ -175,4 +180,32 @@ unset_proxy() {
   git config --global --unset http.proxy 2>/dev/null
   git config --global --unset https.proxy 2>/dev/null
   echo "Proxy unset."
+}
+
+# ==========================================
+# OS related
+# ==========================================
+
+# Check if running on Arch Linux or an Arch-based distro
+# (matches ID=arch, or any distro with "arch" in ID_LIKE).
+# Returns 0 on match, 1 otherwise.
+#
+# Usage:
+#   if is_archlinux; then
+#       echo "on Arch"
+#   fi
+#
+#   is_archlinux && pacman -Syu
+is_archlinux() {
+  [[ -r /etc/os-release ]] || return 1
+  local id like
+  id=$(
+    . /etc/os-release 2>/dev/null
+    printf '%s' "$ID"
+  )
+  like=$(
+    . /etc/os-release 2>/dev/null
+    printf '%s' "$ID_LIKE"
+  )
+  [[ $id == arch || $like == *arch* ]]
 }

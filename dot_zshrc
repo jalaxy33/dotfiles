@@ -13,95 +13,43 @@
 # Reference:
 #   - https://www.bilibili.com/video/BV1fdTfzeE8X/
 
-#
-#-- Imports
-#
-# Load configs in `~/.zsh/`
-source "$HOME/.zsh/zsh_functions.sh"
-source "$HOME/.zsh/zsh_keybinds.sh"
-source "$HOME/.zsh/zsh_aliases.sh"
+#==========================================
+# Imports
+#==========================================
 
 # Load configs in `~/.bash/`
 source "$HOME/.bash/bash_functions.sh"
 source "$HOME/.bash/bash_env.sh"
 source "$HOME/.bash/bash_aliases.sh"
+source "$HOME/.bash/bash_paths.sh"
+source "$HOME/.bash/bash_languages.sh"
 
-# Add `~/.bash/bin/` to PATH, which contains custom commands
-SCRIPTS_DIR="$HOME/.bash/bin/"
-[ -d $SCRIPTS_DIR ] && prepend_path $SCRIPTS_DIR || echo "Warning: $SCIRPTS_DIR not exists!"
+# Load configs in `~/.zsh/`
+source "$HOME/.config/zsh/zsh_functions.zsh"
+source "$HOME/.config/zsh/zsh_keybinds.zsh"
+source "$HOME/.config/zsh/zsh_aliases.zsh"
 
-# Add `~/.local/bin` to PATH
-LOCAL_BIN_DIR="$HOME/.local/bin"
-[ -d $LOCAL_BIN_DIR ] && prepend_path $LOCAL_BIN_DIR
+#==========================================
+# Init Apps
+#==========================================
 
-# load ~/.env
-[[ -f ~/.env ]] && load_dotenv
-
-#
-#-- init zimfw or starship
-#
-
-USE_ZIMFW="true" # true | false
-if [[ -n $(get_zimfw) && $USE_ZIMFW == "true" ]]; then
-  #-- use zimfw
-  activate_zimfw
-else
-  # -- use starship
-  command_exists starship && eval "$(starship init zsh)"
-
-  # fix: command not found: compdef
-  autoload -Uz compinit && compinit
-fi
-
-#
-#-- try to activate homebrew
-#
+# try to activate homebrew (if installed)
 BREW_PREFIX="/home/linuxbrew/.linuxbrew"
 BREW_CMD="$BREW_PREFIX/bin/brew"
-[[ -x $BREW_CMD ]] && eval "$($BREW_CMD shellenv)"
+[[ -f $BREW_CMD ]] && eval "$($BREW_CMD shellenv)"
 
-#
-#-- Init apps
-#
+# activate zimfw or starship
+activate_zimfw
+[[ ! is_zimfw_loaded ]] && command_exists starship && eval "$(starship init zsh)"
+
+# init apps
 command_exists zoxide && eval "$(zoxide init zsh --cmd cd)"
 command_exists fzf && source <(fzf --zsh)
-
-# config yazi
-y() {
-  command_exists yazi || return 1
-  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-  command yazi "$@" --cwd-file="$tmp"
-  IFS= read -r -d '' cwd <"$tmp"
-  [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
-  rm -f -- "$tmp"
-}
-
-# jujutsu completion
 command_exists jj && source <(COMPLETE=zsh jj)
 
-#
-#-- Language
-#
-# rust
-[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+#==========================================
+# zsh specific
+#==========================================
 
-# npm
-if [ -d "$HOME/.npm-global/bin" ]; then
-  prepend_path "$HOME/.npm-global/bin"
-fi
-
-# pnpm
-if [ -d "$HOME/.local/share/pnpm" ]; then
-  export PNPM_HOME="$HOME/.local/share/pnpm"
-  prepend_path "$PNPM_HOME"
-fi
-
-# bun
-if [ -d "$HOME/.bun/bin" ]; then
-  export BUN_BIN_DIR="$HOME/.bun/bin"
-  prepend_path "$BUN_BIN_DIR"
-fi
-
-# haskell
-[ -d "$HOME/.ghcup/bin" ] && prepend_path "$HOME/.ghcup/bin"
-[ -d "$HOME/.cabal/bin" ] && prepend_path "$HOME/.cabal/bin"
+# fix: command not found: compdef
+[[ ! is_zimfw_loaded ]] && autoload -Uz compinit && compinit
