@@ -6,102 +6,47 @@
 #
 # Optional but useful:
 #  - bat, helix, rsync, neovim, fastfetch, lazygit
-#  - flyline
+#
+# bash specific:
+#  - flyline, bash-completion
 
 #==========================================
 # Imports
 #==========================================
 
 # Load configs in `~/.bash/`
-source "$HOME/.bash/bash_functions.sh"
-source "$HOME/.bash/bash_env.sh"
-source "$HOME/.bash/bash_aliases.sh"
-source "$HOME/.bash/bash_paths.sh"
-
-#==========================================
-# Bash configs
-#==========================================
-
-# If not running interactively, don't do anything
-[[ $- != *i* ]] && return
-
-# prompt format
-PS1='[\u@\h \W]\$ '
-
-# auto cd
-shopt -s autocd
-
-# line wrap on window resize
-shopt -s checkwinsize
-
-# history related settings
-## ignore duplicate lines and space in the history.
-HISTCONTROL=ignoredups:ignorespace
-
-## append to the history file, don't overwrite it
-shopt -s histappend
-
-## for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=50
-HISTFILESIZE=100
-
-## history show timestamp
-HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S  "
+source "$HOME/.bash/functions.sh"
+source "$HOME/.bash/env.sh"
+source "$HOME/.bash/aliases.sh"
+source "$HOME/.bash/paths.sh"
 
 #==========================================
 # Init Apps
 #==========================================
 
 # try to activate homebrew (if installed)
-BREW_PREFIX="/home/linuxbrew/.linuxbrew"
-BREW_CMD="$BREW_PREFIX/bin/brew"
+BREW_CMD="/home/linuxbrew/.linuxbrew/bin/brew"
 [[ -f $BREW_CMD ]] && eval "$($BREW_CMD shellenv)"
 
 # init apps
 command_exists starship && eval "$(starship init bash)"
 command_exists zoxide && eval "$(zoxide init bash --cmd cd)"
 command_exists fzf && eval "$(fzf --bash)"
-command_exists jj && source <(COMPLETE=bash jj)
 
 #==========================================
 # Bash specific
 #==========================================
 
-# Initialize bash-completion, preferring system-installed version.
-init_bash_completion() {
-  # Only run in interactive shells and avoid reloading.
-  [[ -z $PS1 || -n ${BASH_COMPLETION_VERSINFO:-} ]] && return
+# load bash specific configs
+source "$HOME/.bash/bash-specific/shell-configs.sh"
+source "$HOME/.bash/bash-specific/bash-funcs.sh"
 
-  # Candidate paths in priority order (system first).
-  local paths=(
-    "/usr/share/bash-completion/bash_completion"
-    "$BREW_PREFIX/etc/profile.d/bash_completion.sh"
-  )
+#
+# -- bash specific apps --
+#
 
-  local path
-  for path in "${paths[@]}"; do
-    if [[ -f $path ]]; then
-      source "$path"
-      return $? # Return source's exit status.
-    fi
-  done
-  # No completion script found; do nothing.
-}
-init_bash_completion
+# bash-completion
+activate_bash_completion
 
-# fish-like interactive behavior
-init_flyline() {
-  local paths=(
-    "/usr/lib/bash/libflyline.so"
-    "$BREW_PREFIX/lib/bash/flyline"
-  )
-
-  local path
-  for path in "${paths[@]}"; do
-    if [[ -f $path ]]; then
-      enable -f $path flyline
-      return $?
-    fi
-  done
-}
-init_flyline
+# flyline -- fish-like interactive behavior
+activate_flyline

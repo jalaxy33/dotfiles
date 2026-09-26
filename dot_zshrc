@@ -18,13 +18,13 @@
 #==========================================
 
 # Load configs in `~/.bash/`
-source "$HOME/.bash/bash_functions.sh"
-source "$HOME/.bash/bash_env.sh"
-source "$HOME/.bash/bash_aliases.sh"
-source "$HOME/.bash/bash_paths.sh"
-source "$HOME/.bash/bash_languages.sh"
+source "$HOME/.bash/functions.sh"
+source "$HOME/.bash/env.sh"
+source "$HOME/.bash/aliases.sh"
+source "$HOME/.bash/paths.sh"
+source "$HOME/.bash/languages.sh"
 
-# Load configs in `~/.zsh/`
+# Load configs in `~/.config/zsh/`
 source "$HOME/.config/zsh/zsh_functions.zsh"
 source "$HOME/.config/zsh/zsh_keybinds.zsh"
 source "$HOME/.config/zsh/zsh_aliases.zsh"
@@ -34,8 +34,7 @@ source "$HOME/.config/zsh/zsh_aliases.zsh"
 #==========================================
 
 # try to activate homebrew (if installed)
-BREW_PREFIX="/home/linuxbrew/.linuxbrew"
-BREW_CMD="$BREW_PREFIX/bin/brew"
+BREW_CMD="/home/linuxbrew/.linuxbrew/bin/brew"
 [[ -f $BREW_CMD ]] && eval "$($BREW_CMD shellenv)"
 
 # activate zimfw or starship
@@ -45,7 +44,6 @@ activate_zimfw
 # init apps
 command_exists zoxide && eval "$(zoxide init zsh --cmd cd)"
 command_exists fzf && source <(fzf --zsh)
-command_exists jj && source <(COMPLETE=zsh jj)
 
 #==========================================
 # zsh specific
