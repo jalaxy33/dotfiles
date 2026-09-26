@@ -21,8 +21,7 @@ end
 
 
 # try to activate homebrew (if installed)
-set BREW_PREFIX "/home/linuxbrew/.linuxbrew"
-set BREW_CMD "$BREW_PREFIX/bin/brew"
+set BREW_CMD "/home/linuxbrew/.linuxbrew/bin/brew"
 command -q $BREW_CMD && eval ($BREW_CMD shellenv)
 
 
@@ -30,5 +29,4 @@ command -q $BREW_CMD && eval ($BREW_CMD shellenv)
 command -q starship && starship init fish | source
 command -q zoxide && zoxide init fish --cmd cd | source
 command -q fzf && fzf --fish | source
-command -q jj && COMPLETE=fish jj | source
 
