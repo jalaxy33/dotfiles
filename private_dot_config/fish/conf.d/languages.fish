@@ -5,26 +5,26 @@
 
 
 # rust
-test -f "$HOME/.cargo/env.fish" && source "$HOME/.cargo/env.fish"
+try_source "$HOME/.cargo/env.fish"
 
 # npm
-if test -d "$HOME/.npm-global/bin"
-  prepend_path "$HOME/.npm-global/bin"
-end
+prepend_path "$HOME/.npm-global/bin"
 
 # pnpm
-if test -d "$HOME/.local/share/pnpm"
-    set -gx PNPM_HOME "$HOME/.local/share/pnpm"
+set PNPM_HOME "$HOME/.local/share/pnpm"
+if test -d "$PNPM_HOME"
+    set -gx PNPM_HOME $PNPM_HOME
     prepend_path $PNPM_HOME
 end
 
 # bun
-if test -d "$HOME/.bun/bin"
-    set -gx BUN_BIN_DIR "$HOME/.bun/bin"
+set BUN_BIN_DIR "$HOME/.bun/bin"
+if test -d "$BUN_BIN_DIR"
+    set -gx BUN_BIN_DIR $BUN_BIN_DIR
     prepend_path $BUN_BIN_DIR
 end
 
 # haskell
-test -d "$HOME/.ghcup/bin" && prepend_path "$HOME/.ghcup/bin" 
-test -d "$HOME/.cabal/bin" && prepend_path "$HOME/.cabal/bin"
+prepend_path "$HOME/.ghcup/bin" 
+prepend_path "$HOME/.cabal/bin"
 

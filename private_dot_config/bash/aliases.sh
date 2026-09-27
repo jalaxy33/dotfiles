@@ -3,7 +3,7 @@
 # aliases.sh -- command aliases
 #
 
-source "$HOME/.bash/functions.sh"
+source "$HOME/.config/bash/functions.sh"
 
 #
 # -- system commands
@@ -83,7 +83,7 @@ fi
 
 # chezmoi for niri dotfiles
 if command_exists chezmoi; then
-  alias nirichezmoi="chezmoi -S ~/.local/share/chezmoi-niri/"
+  alias nirichezmoi="chezmoi -S $HOME/.local/share/chezmoi-niri/"
 fi
 
 #

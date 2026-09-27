@@ -15,10 +15,10 @@
 #==========================================
 
 # Load configs in `~/.bash/`
-source "$HOME/.bash/functions.sh"
-source "$HOME/.bash/env.sh"
-source "$HOME/.bash/aliases.sh"
-source "$HOME/.bash/paths.sh"
+source "$HOME/.config/bash/functions.sh"
+source "$HOME/.config/bash/env.sh"
+source "$HOME/.config/bash/aliases.sh"
+source "$HOME/.config/bash/paths.sh"
 
 #==========================================
 # Init Apps
@@ -38,8 +38,8 @@ command_exists fzf && eval "$(fzf --bash)"
 #==========================================
 
 # load bash specific configs
-source "$HOME/.bash/bash-specific/shell-configs.sh"
-source "$HOME/.bash/bash-specific/bash-funcs.sh"
+source "$HOME/.config/bash/bash-specific/shell-configs.sh"
+source "$HOME/.config/bash/bash-specific/bash-funcs.sh"
 
 #
 # -- bash specific apps --
