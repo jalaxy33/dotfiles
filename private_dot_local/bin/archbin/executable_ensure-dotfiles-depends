@@ -16,8 +16,8 @@ set -euo pipefail
 SCRIPT_DIR="$(dirname ${BASH_SOURCE[0]})"
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"
 IS_ARCH="$SCRIPT_DIR/is_archlinux"
-ENSURE_ARCHLINUXCN="$SCRIPT_DIR/ensure-archlinuxcn"
 PROXY_OK="$SCRIPT_DIR/proxy_ok"
+ENSURE_ARCHLINUXCN="$SCRIPT_DIR/ensure-archlinuxcn"
 
 # check helper scripts
 if [ ! -x $IS_ARCH ]; then
@@ -27,6 +27,11 @@ fi
 
 if [ ! -x $PROXY_OK ]; then
   echo "$SCRIPT_NAME: error: scripts $PROXY_OK not exists!" >&2
+  exit 1
+fi
+
+if [ ! -x $ENSURE_ARCHLINUXCN ]; then
+  echo "$SCRIPT_NAME: error: scripts $ENSURE_ARCHLINUXCN not exists!" >&2
   exit 1
 fi
 
