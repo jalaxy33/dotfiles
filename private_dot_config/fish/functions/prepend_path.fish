@@ -1,12 +1,12 @@
-# prepend_path - Prepend directories to PATH if missing
-# Usage: prepend_path dir1 [dir2 ...]
-# 
-# The function adds each given directory to the beginning of PATH
-# only if it's not already present. It only affects the current session.
+# prepend_path - Prepend dirs to PATH if they exist and are missing;
+#  usage: prepend_path dir1 [dir2...]
 function prepend_path
     for dir in $argv
-        if not contains -- $dir $PATH
-            set -gx PATH $dir $PATH
-        end
+        # skip if not exist
+        test -n "$dir" -a -d "$dir"; or continue
+        # skip if already in $PATH
+        contains -- $dir $PATH; and continue
+        set -p PATH $dir
     end
+    return 0
 end

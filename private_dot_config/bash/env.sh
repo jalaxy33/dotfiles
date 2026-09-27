@@ -3,7 +3,7 @@
 # env.sh -- Setting environment variables for bash
 #
 
-source "$HOME/.bash/functions.sh"
+source "$HOME/.config/bash/functions.sh"
 
 #======================================
 # apps

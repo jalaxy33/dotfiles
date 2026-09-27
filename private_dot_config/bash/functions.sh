@@ -18,14 +18,30 @@ command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
-# prepend_path - Prepend dirs to PATH if missing;
+# prepend_path - Prepend dirs to PATH if exist and missing;
 #  usage: prepend_path dir1 [dir2...]
 prepend_path() {
   local dir
   for dir in "$@"; do
+    # skip if not exists
+    [[ -n $dir && -d $dir ]] || continue
+    # skip if already in $PATH
     [[ ":$PATH:" == *":$dir:"* ]] || PATH="$dir:$PATH"
   done
   export PATH
+  return 0
+}
+
+# Source FILE(s) if they exist and are readable.
+# Usage: try_source FILE [FILE...]
+# Example: try_source "$HOME/.bashrc.local"
+try_source() {
+  local file
+  for file in "$@"; do
+    [[ -f $file && -r $file ]] || continue
+    source "$file"
+  done
+  return 0
 }
 
 # load .env file

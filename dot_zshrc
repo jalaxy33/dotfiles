@@ -18,11 +18,11 @@
 #==========================================
 
 # Load configs in `~/.bash/`
-source "$HOME/.bash/functions.sh"
-source "$HOME/.bash/env.sh"
-source "$HOME/.bash/aliases.sh"
-source "$HOME/.bash/paths.sh"
-source "$HOME/.bash/languages.sh"
+source "$HOME/.config/bash/functions.sh"
+source "$HOME/.config/bash/env.sh"
+source "$HOME/.config/bash/aliases.sh"
+source "$HOME/.config/bash/paths.sh"
+source "$HOME/.config/bash/languages.sh"
 
 # Load configs in `~/.config/zsh/`
 source "$HOME/.config/zsh/zsh_functions.zsh"
