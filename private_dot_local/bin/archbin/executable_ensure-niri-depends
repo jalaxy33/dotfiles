@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Check and install missing dependencies for my dotfiles:
-#   https://github.com/jalaxy33/dotfiles
+# Check and install missing dependencies for my niri dotfiles:
+#   https://github.com/jalaxy33/niri-dotfiles
 #
 # NOTE: Only available for archlinux!
 #
@@ -17,7 +17,7 @@ SCRIPT_DIR="$(dirname ${BASH_SOURCE[0]})"
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"
 IS_ARCH="$SCRIPT_DIR/is_archlinux"
 PROXY_OK="$SCRIPT_DIR/proxy_ok"
-ENSURE_ARCHLINUXCN="$SCRIPT_DIR/ensure-archlinuxcn"
+ENSURE_DOTFILES_DEPENDS="$SCRIPT_DIR/ensure-dotfiles-depends"
 
 # check helper scripts
 if [ ! -x $IS_ARCH ]; then
@@ -30,8 +30,8 @@ if [ ! -x $PROXY_OK ]; then
   exit 1
 fi
 
-if [ ! -x $ENSURE_ARCHLINUXCN ]; then
-  echo "$SCRIPT_NAME: error: scripts $ENSURE_ARCHLINUXCN not exists!" >&2
+if [ ! -x $ENSURE_DOTFILES_DEPENDS ]; then
+  echo "$SCRIPT_NAME: error: scripts $ENSURE_DOTFILES_DEPENDS not exists!" >&2
   exit 1
 fi
 
@@ -45,8 +45,8 @@ fi
 # Run before this
 #==================================
 
-# ensure-archlinuxcn
-$ENSURE_ARCHLINUXCN
+# ensure-dotfiles-depends
+$ENSURE_DOTFILES_DEPENDS
 
 #==================================
 # List dependencies
@@ -54,23 +54,15 @@ $ENSURE_ARCHLINUXCN
 
 # install by pacman
 pac_depends=(
-  "paru"
+  "kitty"
   "fish"
-  "starship"
-  "zoxide"
-  "fzf"
-  "eza"
-  "jq"
-  "ripgrep"
-  "fd"
-  "lazygit"
-  "fastfetch"
-  "rsync"
-  "helix"
-  "bat"
-  "bash-completion"
-  "nodejs"
-  "npm"
+  "thunar"
+  "imv"
+  "satty"
+  "wl-clipboard"
+  # GTK theme
+  "adw-gtk-theme"
+  "nwg-look"
 )
 
 # install from AUR
@@ -79,8 +71,7 @@ aur_depends=(
 
 # install from AUR with proxy needed
 aur_proxy_depends=(
-  "flyline"
-  "shorin-contrib-git"
+  "ttf-jetbrains-maple-mono-nf-xx-xx"
 )
 
 #==================================
@@ -88,7 +79,7 @@ aur_proxy_depends=(
 #==================================
 
 echo ""
-echo "====== dotfiles: pacman ======"
+echo "====== niri: pacman ======"
 echo ""
 
 if [[ ${#pac_depends[@]} -ne 0 ]]; then
@@ -104,7 +95,7 @@ fi
 #==================================
 
 echo ""
-echo "====== dotfiles: AUR ======"
+echo "====== niri: AUR ======"
 echo ""
 
 if [[ ${#aur_depends[@]} -ne 0 ]]; then
@@ -120,7 +111,7 @@ fi
 #==================================
 
 echo ""
-echo "====== dotfiles: AUR (proxy needed) ======"
+echo "====== niri: AUR (proxy needed) ======"
 echo ""
 
 if [[ ${#aur_proxy_depends[@]} -ne 0 ]]; then
