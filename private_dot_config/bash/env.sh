@@ -42,3 +42,14 @@ export GOPROXY="https://mirrors.tencent.com/go/"
 
 # load ~/.env
 [[ -f ~/.env ]] && load_dotenv
+
+#======================================
+# os-specific
+#======================================
+
+# libtorch
+if is_archlinux && [ -d /opt/libtorch ]; then
+  export LIBTORCH="/opt/libtorch"
+  export LD_LIBRARY_PATH="$LIBTORCH/lib":$LD_LIBRARY_PATH
+  export LIBTORCH_BYPASS_VERSION_CHECK="1"
+fi

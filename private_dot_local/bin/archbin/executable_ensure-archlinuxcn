@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# ensure-archlinuxcn - Add archlinuxcn repo if missing, then install keyring.
+# Usage:
+#   ./ensure-archlinuxcn
+#   sudo ./ensure-archlinuxcn
+
+set -euo pipefail
+
+#==================================
+# Pre-check
+#==================================
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_NAME="$(basename $0)"
+IS_ARCH="$SCRIPT_DIR/is_archlinux"
+
+# check helper scripts
+if [ ! -x $IS_ARCH ]; then
+  echo "$SCRIPT_NAME: error: scripts $IS_ARCH not exists!" >&2
+  exit 1
+fi
+
+# early exit when not in archlinux
+if ! $IS_ARCH; then
+  echo "$SCRIPT_NAME: error: This script only support archlinux!" >&2
+  exit 1
+fi
+
+#==================================
+# Running
+#==================================
+
+CONF=/etc/pacman.conf
+SUDO=$([ "$EUID" -eq 0 ] && echo "" || echo "sudo")
+
+echo ""
+echo "=====  archlinuxcn  ======"
+echo ""
+
+if ! grep -qE '^[[:space:]]*\[archlinuxcn\]' "$CONF"; then
+  $SUDO tee -a "$CONF" >/dev/null <<'EOF'
+
+[archlinuxcn]
+Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
+Server = https://mirrors.hit.edu.cn/archlinuxcn/$arch
+Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch
+Server = https://repo.huaweicloud.com/archlinuxcn/$arch
+EOF
+  echo "Added archlinuxcn repository."
+else
+  echo "archlinuxcn repository already exists."
+fi
+
+$SUDO pacman -Sy --needed --noconfirm archlinuxcn-keyring
+
+echo "Done."
