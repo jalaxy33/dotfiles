@@ -198,6 +198,15 @@ unset_proxy() {
   echo "Proxy unset."
 }
 
+# Check if the proxy is working.
+# Usage:
+#   proxy_ok && echo "online" || echo "offline"
+proxy_ok() {
+  curl -fsI --connect-timeout 3 --max-time 5 -o /dev/null https://www.google.com \
+    || curl -fsI --connect-timeout 3 --max-time 5 -o /dev/null https://www.youtube.com \
+    || curl -fsI --connect-timeout 3 --max-time 5 -o /dev/null https://www.cloudflare.com
+}
+
 # ==========================================
 # OS specific
 # ==========================================

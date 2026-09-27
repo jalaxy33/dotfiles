@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Check if running on Arch Linux or an Arch-based distro
+# (matches ID=arch, or any distro with "arch" in ID_LIKE).
+# Exit 0 on match, 1 otherwise.
+#
+# Usage:
+#   is_archlinux && pacman -Syu
+#
+#   if is_archlinux; then
+#       echo "on Arch"
+#   fi
+
+[[ -r /etc/os-release ]] || exit 1
+
+. /etc/os-release 2>/dev/null
+
+[[ ${ID:-} == arch || ${ID_LIKE:-} == *arch* ]]

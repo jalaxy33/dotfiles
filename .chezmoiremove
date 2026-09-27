@@ -1,2 +1,3 @@
 .zsh
 .bash
+.config/fish/conf.d/device-specific.fish

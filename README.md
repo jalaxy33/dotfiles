@@ -2,33 +2,67 @@
 
 Some of my dotfiles. Managed by [chezmoi](https://www.chezmoi.io/).
 
-## Usage
+## How to use
 
-### Load configs from this repo
+### Apply configs from this repo
 
-- Load configs from my Github dotfiles repo on a new, empty machine:
+- Apply configs from my dotfiles repo on a new, empty machine:
 
   ```sh
   chezmoi init --apply jalaxy33
   ```
 
-  Easier sync for CN user:
+  > <details>
+  > <summary>Easier clone for CN user:</summary>
+  >
+  > ```sh
+  > chezmoi init --apply https://gh-proxy.org/https://github.com/jalaxy33/dotfiles
+  > ```
+  >
+  > </details>
 
-  ```sh
-  chezmoi init --apply https://gh-proxy.org/https://github.com/jalaxy33/dotfiles
-  ```
-
-- Updating configs on any machine:
+- Sync with latest configs:
 
   ```sh
   chezmoi update
   ```
 
-- Update certain config file, for example:
+- Sync with certain config file:
 
   ```sh
-  chezmoi apply ~/.bashrc
+  chezmoi apply <path-to-file>
   ```
+
+### Check difference with remote
+
+- Check changed files:
+
+  ```sh
+  chezmoi status
+  ```
+
+- Check differences
+
+  ```sh
+  chezmoi diff
+  ```
+
+### Deal with conflits
+
+- go to local chezmoi folder, and deal with `git`:
+
+  ```sh
+  chezmoi cd
+  git <command>
+  exit
+  ```
+
+## Advanced Usages
+
+Please check [chezmoi](https://www.chezmoi.io/) for details.
+
+<details>
+<summary>More tips</summary>
 
 ### Sync with local changes
 
@@ -118,3 +152,5 @@ Use [template](https://www.chezmoi.io/user-guide/templating/#editing-a-template-
   ```sh
   chezmoi execute-template '{{ .chezmoi.hostname }}'
   ```
+
+</details>
