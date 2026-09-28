@@ -10,9 +10,9 @@ set -euo pipefail
 # Pre-check
 #==================================
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_NAME="$(basename $0)"
-IS_ARCH="$SCRIPT_DIR/is_archlinux"
+ARCHBIN_DIR="$HOME/.local/bin/archbin"
+SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"
+IS_ARCH="$ARCHBIN_DIR/is_archlinux"
 
 # check helper scripts
 if [ ! -x $IS_ARCH ]; then
