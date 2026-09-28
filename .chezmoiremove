@@ -1,3 +1,4 @@
 .zsh
 .bash
 .config/fish/conf.d/device-specific.fish
+.local/bin/archbin/proxy_ok
