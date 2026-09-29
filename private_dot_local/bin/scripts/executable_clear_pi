@@ -65,7 +65,7 @@ clean_directory $PI_HOME "${pi_keeps[@]}"
 PI_AGENT_DIR="$PI_HOME/agent"
 pi_agent_keeps=(
   npm/ git/ extensions/ local-packages/ pi-blackhole/
-  .gitignore auth.json settings.json models.json keybindings.json models-store.json
+  .gitignore auth.json settings.json models.json models.private.json keybindings.json models-store.json
   mcp.json subagents.json multimodal-proxy.json .env
   APPEND_SYSTEM.md AGENTS.md
 )
