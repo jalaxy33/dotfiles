@@ -13,7 +13,6 @@ alias nv='nvim'
 # command abbrs
 abbr fa fastfetch
 abbr lg lazygit
-abbr reboot 'systemctl reboot'
 abbr grub 'sudo grub-mkconfig -o /boot/grub/grub.cfg'
 abbr clc claude
 abbr oc opencode
@@ -71,6 +70,12 @@ if command -q chezmoi
     alias nirichezmoi="chezmoi -S ~/.local/share/chezmoi-niri/"
 end
 
+# reboot
+if command -q tidy_reboot
+  abbr reboot "sudo tidy_reboot"
+else
+  abbr reboot "sudo systemctl reboot"
+end
 
 #
 #-- alias functions

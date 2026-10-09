@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#
+# reboot after stopping some services
+#   usage: sudo tidy_reboot
+#
+
+# stop services
+systemctl stop "daed" 2>/dev/null
+
+# reboot
+systemctl reboot

@@ -10,6 +10,9 @@
 # bash specific:
 #  - flyline, bash-completion
 
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
 #==========================================
 # Imports
 #==========================================
@@ -49,4 +52,4 @@ source "$HOME/.config/bash/bash-specific/bash-funcs.sh"
 activate_bash_completion
 
 # flyline -- fish-like interactive behavior
-activate_flyline
+# activate_flyline
