@@ -31,7 +31,6 @@ alias nv="nvim"
 # command abbrs
 alias fa="fastfetch"
 alias lg="lazygit"
-alias reboot="systemctl reboot"
 alias grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
 alias clc="claude"
 alias oc="opencode"
@@ -84,6 +83,13 @@ fi
 # chezmoi for niri dotfiles
 if command_exists chezmoi; then
   alias nirichezmoi="chezmoi -S $HOME/.local/share/chezmoi-niri/"
+fi
+
+# reboot
+if command_exists tidy_reboot; then
+  alias reboot="sudo tidy_reboot"
+else
+  alias reboot="sudo systemctl reboot"
 fi
 
 #
