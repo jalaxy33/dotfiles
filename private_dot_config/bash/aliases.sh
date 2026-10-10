@@ -35,6 +35,10 @@ alias grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
 alias clc="claude"
 alias oc="opencode"
 
+# reboot/poweroff
+alias reboot="sudo tidy_reboot"
+alias poweroff="sudo tidy_poweroff"
+
 # configs shortcuts
 BASH_CONFIG="$HOME/.bashrc"
 alias vibash="vi $BASH_CONFIG"
@@ -83,13 +87,6 @@ fi
 # chezmoi for niri dotfiles
 if command_exists chezmoi; then
   alias nirichezmoi="chezmoi -S $HOME/.local/share/chezmoi-niri/"
-fi
-
-# reboot
-if command_exists tidy_reboot; then
-  alias reboot="sudo tidy_reboot"
-else
-  alias reboot="sudo systemctl reboot"
 fi
 
 #
