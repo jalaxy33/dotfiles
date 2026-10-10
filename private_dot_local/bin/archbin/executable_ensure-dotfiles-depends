@@ -56,6 +56,7 @@ $ENSURE_ARCHLINUXCN
 
 # install by pacman
 pac_depends=(
+  "wget"
   "paru"
   "fish"
   "starship"

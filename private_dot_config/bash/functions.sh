@@ -89,6 +89,18 @@ load_dotenv() {
       continue
     fi
 
+    # # stop a running systemd service
+    # #  usage: stop_service xxx.service
+    # stop_service() {
+    #   systemctl stop "$1" 2>/dev/null
+    # }
+    #
+    # # reboot after stopping some services
+    # #   usage: tidy_reboot
+    # tidy_reboot() {
+    #   sudo stop_service daed
+    #   sudo systemctl reboot
+    # }
     # ---------- 4. Handle optional 'export' prefix ----------
     if [[ $line =~ ^export[[:space:]]+(.*) ]]; then
       # Remove 'export' and any following spaces
@@ -205,6 +217,37 @@ proxy_ok() {
   curl -fsI --connect-timeout 3 --max-time 5 -o /dev/null https://www.google.com \
     || curl -fsI --connect-timeout 3 --max-time 5 -o /dev/null https://www.youtube.com \
     || curl -fsI --connect-timeout 3 --max-time 5 -o /dev/null https://www.cloudflare.com
+}
+
+# ==========================================
+# poweroff & reboot
+# ==========================================
+
+SERVICES_TO_STOP=(
+  daed
+  dae
+)
+
+# stop services before poweroff/reboot
+_stop_services_before_poweroff() {
+  for service in "${SERVICES_TO_STOP[@]}"; do
+    echo "stopping service: $service"
+    systemctl stop "$service" 2>/dev/null
+  done
+}
+
+# reboot after stopping some services
+#   usage: sudo tidy_reboot
+tidy_reboot() {
+  _stop_services_before_poweroff
+  systemctl reboot
+}
+
+# poweroff after stopping some services
+#   usage: sudo tidy_poweroff
+tidy_poweroff() {
+  _stop_services_before_poweroff
+  systemctl poweroff
 }
 
 # ==========================================
