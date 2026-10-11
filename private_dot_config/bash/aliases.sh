@@ -44,6 +44,10 @@ alias grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
 alias clc="claude"
 alias oc="opencode"
 
+# reboot/poweroff
+alias reboot="sudo systemctl reboot"
+alias poweroff="sudo systemctl poweroff"
+
 # configs shortcuts
 BASH_CONFIG="$HOME/.bashrc"
 alias vibash="vi $BASH_CONFIG"
@@ -66,18 +70,6 @@ alias hxfish="hx $FISH_CONFIG"
 alias catfish="cat $FISH_CONFIG"
 alias batfish="bat $FISH_CONFIG"
 
-# reboot/poweroff
-if command_exists tidy_reboot; then
-  alias reboot="sudo tidy_reboot"
-else
-  alias reboot="sudo systemctl reboot"
-fi
-
-if command_exists tidy_poweroff; then
-  alias poweroff="sudo tidy_poweroff"
-else
-  alias poweroff="sudo systemctl poweroff"
-fi
 
 # ==========================================
 # command aliases

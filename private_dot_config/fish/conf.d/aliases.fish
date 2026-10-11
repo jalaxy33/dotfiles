@@ -20,6 +20,10 @@ abbr grub 'sudo grub-mkconfig -o /boot/grub/grub.cfg'
 abbr clc claude
 abbr oc opencode
 
+# reboot/poweroff
+abbr reboot "sudo systemctl reboot"
+abbr poweroff "sudo systemctl poweroff"
+
 # history with timestamp
 abbr history 'history --show-time="%Y-%m-%d %H:%M:%S "'
 
@@ -44,19 +48,6 @@ alias nvfish="nv $FISH_CONFIG"
 alias hxfish="hx $FISH_CONFIG"
 alias catfish="cat $FISH_CONFIG"
 alias batfish="bat $FISH_CONFIG"
-
-# reboot & poweroff
-if command -q tidy_reboot
-  abbr reboot "sudo tidy_reboot"
-else
-  abbr reboot "sudo systemctl reboot"
-end
-
-if command -q tidy_poweroff
-  abbr poweroff "sudo tidy_poweroff"
-else
-  abbr poweroff "sudo systemctl poweroff"
-end
 
 
 # ==========================================
