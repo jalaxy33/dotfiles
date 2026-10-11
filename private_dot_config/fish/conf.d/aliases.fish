@@ -3,9 +3,10 @@
 # Command aliases
 #
 
-#
-#-- aliases & abbrs
-#
+# ==========================================
+# aliases & abbrs
+# ==========================================
+
 # editor aliases
 alias vi='vim'
 alias nv='nvim'
@@ -16,10 +17,6 @@ abbr lg lazygit
 abbr grub 'sudo grub-mkconfig -o /boot/grub/grub.cfg'
 abbr clc claude
 abbr oc opencode
-
-# reboot/poweroff
-abbr reboot "sudo tidy_reboot"
-abbr poweroff "sudo tidy_poweroff"
 
 # history with timestamp
 abbr history 'history --show-time="%Y-%m-%d %H:%M:%S "'
@@ -46,9 +43,24 @@ alias hxfish="hx $FISH_CONFIG"
 alias catfish="cat $FISH_CONFIG"
 alias batfish="bat $FISH_CONFIG"
 
-#
-#-- command aliases
-#
+# reboot & poweroff
+if command -q tidy_reboot
+  abbr reboot "sudo tidy_reboot"
+else
+  abbr reboot "sudo systemctl reboot"
+end
+
+if command -q tidy_poweroff
+  abbr poweroff "sudo tidy_poweroff"
+else
+  abbr poweroff "sudo systemctl poweroff"
+end
+
+
+# ==========================================
+# command aliases
+# ==========================================
+
 # shortcuts for rsync
 if command -q rsync
     alias rsyncp="rsync -alvhP"
@@ -75,9 +87,10 @@ if command -q chezmoi
 end
 
 
-#
-#-- alias functions
-#
+# ==========================================
+# alias functions
+# ==========================================
+
 function ls
     command -q eza && command eza --icons --git -a -g $argv
 end
@@ -91,4 +104,3 @@ function y
     end
     rm -f -- "$tmp"
 end
-

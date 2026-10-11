@@ -3,6 +3,12 @@
 # functions.sh -- useful functions
 #
 
+# skip if loaded
+if [[ -n ${__FUNCTIONS_SH_LOADED:-} ]]; then
+  return 0
+fi
+readonly __FUNCTIONS_SH_LOADED=1
+
 # ==========================================
 # Helper Functions
 # ==========================================
@@ -152,102 +158,6 @@ load_dotenv() {
   done <"$file"
 
   return $has_error
-}
-
-# ==========================================
-# Proxy functions
-# ==========================================
-
-# set_proxy - Set HTTP/HTTPS proxy with optional host and port
-# Usage: set_proxy [host[:port]] [port]
-#   - No args:         default 127.0.0.1:7890
-#   - host:port        e.g. set_proxy 192.168.1.1:8080
-#   - host [port]      e.g. set_proxy proxy.example.com 3128
-set_proxy() {
-  local host="127.0.0.1"
-  local port="7890"
-
-  case $# in
-    0)
-      ;;
-    1)
-      if [[ $1 == *:* ]]; then
-        host="${1%:*}"
-        port="${1#*:}"
-      else
-        host="$1"
-      fi
-      ;;
-    2)
-      host="$1"
-      port="$2"
-      ;;
-    *)
-      echo "Usage: set_proxy [host[:port]] [port]" >&2
-      return 1
-      ;;
-  esac
-
-  local proxy_url="$host:$port"
-  local http_proxy="http://$proxy_url"
-
-  echo "proxy_url: $proxy_url"
-
-  export ALL_PROXY="$http_proxy"
-  export HTTP_PROXY="$http_proxy"
-  export HTTPS_PROXY="$http_proxy"
-
-  git config --global http.proxy "$http_proxy"
-  git config --global https.proxy "$http_proxy"
-}
-
-# unset_proxy - Unset HTTP/HTTPS proxy environment variables and git proxy settings
-# Usage: unset_proxy
-unset_proxy() {
-  unset ALL_PROXY HTTP_PROXY HTTPS_PROXY
-  git config --global --unset http.proxy 2>/dev/null
-  git config --global --unset https.proxy 2>/dev/null
-  echo "Proxy unset."
-}
-
-# Check if the proxy is working.
-# Usage:
-#   proxy_ok && echo "online" || echo "offline"
-proxy_ok() {
-  curl -fsI --connect-timeout 3 --max-time 5 -o /dev/null https://www.google.com \
-    || curl -fsI --connect-timeout 3 --max-time 5 -o /dev/null https://www.youtube.com \
-    || curl -fsI --connect-timeout 3 --max-time 5 -o /dev/null https://www.cloudflare.com
-}
-
-# ==========================================
-# poweroff & reboot
-# ==========================================
-
-SERVICES_TO_STOP=(
-  daed
-  dae
-)
-
-# stop services before poweroff/reboot
-_stop_services_before_poweroff() {
-  for service in "${SERVICES_TO_STOP[@]}"; do
-    echo "stopping service: $service"
-    systemctl stop "$service" 2>/dev/null
-  done
-}
-
-# reboot after stopping some services
-#   usage: sudo tidy_reboot
-tidy_reboot() {
-  _stop_services_before_poweroff
-  systemctl reboot
-}
-
-# poweroff after stopping some services
-#   usage: sudo tidy_poweroff
-tidy_poweroff() {
-  _stop_services_before_poweroff
-  systemctl poweroff
 }
 
 # ==========================================

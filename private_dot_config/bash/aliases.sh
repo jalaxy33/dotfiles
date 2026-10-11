@@ -4,10 +4,18 @@
 #
 
 source "$HOME/.config/bash/functions.sh"
+source "$HOME/.config/bash/paths.sh"
 
-#
-# -- system commands
-#
+# skip if loaded
+if [[ -n ${__ALIASES_SH_LOADED:-} ]]; then
+  return 0
+fi
+readonly __ALIASES_SH_LOADED=1
+
+# ==========================================
+# system commands
+# ==========================================
+
 # color support
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
@@ -21,9 +29,10 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
-#
-#-- aliases & abbrs
-#
+# ==========================================
+# aliases & abbrs
+# ==========================================
+
 # editor aliases
 alias vi="vim"
 alias nv="nvim"
@@ -34,10 +43,6 @@ alias lg="lazygit"
 alias grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
 alias clc="claude"
 alias oc="opencode"
-
-# reboot/poweroff
-alias reboot="sudo tidy_reboot"
-alias poweroff="sudo tidy_poweroff"
 
 # configs shortcuts
 BASH_CONFIG="$HOME/.bashrc"
@@ -61,9 +66,23 @@ alias hxfish="hx $FISH_CONFIG"
 alias catfish="cat $FISH_CONFIG"
 alias batfish="bat $FISH_CONFIG"
 
-#
-#-- command aliases
-#
+# reboot/poweroff
+if command_exists tidy_reboot; then
+  alias reboot="sudo tidy_reboot"
+else
+  alias reboot="sudo systemctl reboot"
+fi
+
+if command_exists tidy_poweroff; then
+  alias poweroff="sudo tidy_poweroff"
+else
+  alias poweroff="sudo systemctl poweroff"
+fi
+
+# ==========================================
+# command aliases
+# ==========================================
+
 # shortcuts for rsync
 if command_exists rsync; then
   alias rsyncp="rsync -alvhP"
@@ -89,9 +108,10 @@ if command_exists chezmoi; then
   alias nirichezmoi="chezmoi -S $HOME/.local/share/chezmoi-niri/"
 fi
 
-#
-#-- alias functions
-#
+# ==========================================
+# alias functions
+# ==========================================
+
 function ls() {
   command_exists eza && eza --icons --git -a -g "$@"
 }
