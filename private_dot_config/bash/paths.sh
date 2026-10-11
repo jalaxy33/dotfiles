@@ -5,6 +5,16 @@
 
 source "$HOME/.config/bash/functions.sh"
 
+# skip if loaded
+if [[ -n ${__PATHS_SH_LOADED:-} ]]; then
+  return 0
+fi
+readonly __PATHS_SH_LOADED=1
+
+# ==========================================
+# Set Paths
+# ==========================================
+
 # Add `~/.local/bin` to PATH
 prepend_path "$HOME/.local/bin"
 

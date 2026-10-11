@@ -5,6 +5,16 @@
 
 source "$HOME/.config/bash/functions.sh"
 
+# skip if loaded
+if [[ -n ${__LANGUAGES_SH_LOADED:-} ]]; then
+  return 0
+fi
+readonly __LANGUAGES_SH_LOADED=1
+
+# ==========================================
+# Language Setup
+# ==========================================
+
 # rust
 try_source "$HOME/.cargo/env"
 
