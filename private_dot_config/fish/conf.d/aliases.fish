@@ -3,6 +3,8 @@
 # Command aliases
 #
 
+source "$HOME/.config/fish/conf.d/paths.fish"
+
 # ==========================================
 # aliases & abbrs
 # ==========================================

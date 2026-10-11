@@ -3,6 +3,7 @@
 # poweroff after stopping some services
 #   usage: sudo tidy_poweroff
 #
+set -euo pipefail
 
 SERVICES_TO_STOP=(
   daed

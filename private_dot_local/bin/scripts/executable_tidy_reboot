@@ -3,6 +3,7 @@
 # reboot after stopping some services
 #   usage: sudo tidy_reboot
 #
+set -euo pipefail
 
 SERVICES_TO_STOP=(
   daed
