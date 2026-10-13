@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+#
+# Select default rust toolchain
+#
+
+set -euo pipefail
+
+source "$HOME/.config/rust/scripts/helper-funcs.sh"
+
+# add current script folder to $env:PATH
+prepend_path "$(dirname ${BASH_SOURCE[0]})"
+
+#======================================
+# CLI help info
+#======================================
+
+PROG="${0##*/}"
+VERSION="v0.1.0"
+
+usage() {
+  cat <<EOF
+Select default rust toolchain.
+
+Usage: $PROG [OPTIONS]
+
+  -h, --help      Print help
+  -v, --version   Print version
+EOF
+}
+
+cli_base_args "$PROG" "$VERSION" usage "$@"
+
+#======================================
+# Helper funcs
+#======================================
+
+# ask if use nightly
+# return "1" when choosing nightly, otherwise "0"
+ask_nightly() {
+  if command_exist rustup && [[ -n $(rustup toolchain list | grep nightly) ]]; then
+    confirm 'Use Nightly config?' && echo "1" || echo "0"
+  else
+    echo "0"
+  fi
+}
+
+#======================================
+# Main logics
+#======================================
+
+printf "\n==== setup: default toolchain ====\n\n"
+
+# ask if use nightly toolchain
+USE_NIGHTLY=$(ask_nightly)
+
+# set toolchain
+if is_true $USE_NIGHTLY; then
+  printf $'\n[Running] rustup default nightly\n\n'
+  rustup default nightly
+else
+  printf $'\n[Running] rustup default stable\n\n'
+  rustup default stable
+fi
+
+# setup configs
+printf "\n==== generate: config files ====\n"
+printf "\n[Running] setup_cargo\n"
+setup_cargo

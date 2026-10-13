@@ -7,7 +7,7 @@ set -euo pipefail
 # ==== pre-check ====
 
 # Get the directory where this script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(dirname ${BASH_SOURCE[0]})"
 RM_EXCEPT="$SCRIPT_DIR/rm_except"
 
 # Save current working directory

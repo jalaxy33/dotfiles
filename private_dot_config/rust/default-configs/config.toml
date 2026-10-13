@@ -1,0 +1,47 @@
+# .cargo/config.toml  -  My default config for rust
+# 
+# Works without nightly toolchain 
+#
+# Put this at one of:
+#     ~/.cargo/config.toml
+#     <project-root>/.cargo/config.toml
+# 
+#   (For Windows: change ~ to `C:\Users\<user>` or `C:\Users\<user>\AppData\Roaming` )
+# 
+
+
+#======================================
+# USTC mirror
+#======================================
+
+[source.crates-io]
+replace-with = 'ustc'
+
+[source.ustc]
+registry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
+
+[registries.ustc]
+index = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
+
+
+#======================================
+# better dev experience
+#======================================
+
+# faster dev build
+[profile.dev]
+debug = "line-tables-only" 
+
+
+#======================================
+# faster linker
+#======================================
+
+# faster linker on linux - `mold`
+#
+# Please install `clang` and `mold` first. For example:
+# $ sudo pacman -S mold clang     # archlinux
+[target.'cfg(target_os = "linux")']
+linker = "clang"
+rustflags = ["-C", "link-arg=-fuse-ld=/usr/bin/mold"]
+

@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+#
+# Install and config rust toolchains
+
+set -euo pipefail
+
+source "$HOME/.config/rust/scripts/helper-funcs.sh"
+
+# add current script folder to $env:PATH
+prepend_path "$(dirname ${BASH_SOURCE[0]})"
+
+#======================================
+# CLI help info
+#======================================
+
+PROG="${0##*/}"
+VERSION="v0.1.0"
+
+usage() {
+  cat <<EOF
+Install and config rust toolchains.
+
+Usage: $PROG [OPTIONS]
+
+  -h, --help      Print help
+  -v, --version   Print version
+EOF
+}
+
+cli_base_args "$PROG" "$VERSION" usage "$@"
+
+#======================================
+# Important variables
+#======================================
+
+RUST_DIR="$HOME/.config/rust"
+SCRIPT_DIR="$RUST_DIR/scripts"
+CONFIG_DIR="$RUST_DIR/configs"
+
+#======================================
+# Install rust toolchain
+#======================================
+
+# set mirror
+export RUSTUP_DIST_SERVER="https://mirrors.cernet.edu.cn/rustup"
+export RUSTUP_UPDATE_ROOT="https://mirrors.cernet.edu.cn/rustup/rustup"
+
+# install rustup
+if [ ! -x "$HOME/.cargo/bin/rustup" ]; then
+  printf "\n==== install: rustup ====\n"
+  set_mirror
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+fi
+
+# activate rust
+activate_rust
+
+# install/update toolchains
+printf "\n==== install/update: toolchains ====\n"
+printf "\n[Running] rustup toolchain install stable\n"
+rustup toolchain install stable
+printf "\n[Running] rustup toolchain install nightly\n"
+rustup toolchain install nightly
+
+#======================================
+# Set toolchain
+#======================================
+
+set_rust_toolchain
+
+#======================================
+# Install recommended tools
+#======================================
+
+tool_list=(
+  "cargo-cache"
+  "cargo-update"
+)
+
+if [[ ${#tool_list[@]} -ne 0 ]]; then
+  printf "\n==== install: recommended tools ====\n"
+  echo ""
+  echo "[Running] cargo install ${tool_list[@]}"
+  cargo install "${tool_list[@]}"
+fi
+
+printf "\nDone."

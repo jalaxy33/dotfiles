@@ -1,0 +1,10 @@
+# .cargo/config.toml  - config for rust stable toolchain
+#
+# Works without nightly toolchain
+# 
+# Put this at one of:
+#     ~/.cargo/config.toml
+#     <project-root>/.cargo/config.toml
+# 
+#   (For Windows: change ~ to `C:\Users\<user>` or `C:\Users\<user>\AppData\Roaming` )
+# 

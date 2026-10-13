@@ -1,0 +1,12 @@
+# <project-root>/rust-toolchain.toml
+#
+# Specify project rust toolchain
+#
+
+# use nightly toolchain
+#
+# Install nightly toolchain first by
+# $ rustup toolchain install nightly
+[toolchain]
+channel = "nightly"
+

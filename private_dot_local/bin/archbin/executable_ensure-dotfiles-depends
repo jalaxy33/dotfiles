@@ -74,6 +74,14 @@ pac_depends=(
   "bash-completion"
   "nodejs"
   "npm"
+  # rust depends
+  "mold"
+  "clang"
+  # extra LLVM toolchain
+  "llvm"
+  "lldb"
+  "lld"
+  "libc++"
 )
 
 # install from AUR
