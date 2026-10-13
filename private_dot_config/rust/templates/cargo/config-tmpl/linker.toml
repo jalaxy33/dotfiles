@@ -1,0 +1,12 @@
+#======================================
+# faster linker
+#======================================
+
+# faster linker on linux - `mold`
+#
+# Please install `clang` and `mold` first. For example:
+# $ sudo pacman -S mold clang     # archlinux
+[target.'cfg(target_os = "linux")']
+linker = "clang"
+rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+

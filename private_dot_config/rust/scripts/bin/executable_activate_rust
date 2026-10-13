@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+#
+# Activate rustup toolchain
+# NOTE: Only works in POSIX compatible shell.
+#
+
+set -euo pipefail
+
+source "$HOME/.config/rust/scripts/helper-funcs.sh"
+
+#======================================
+# CLI help info
+#======================================
+
+PROG="${0##*/}"
+VERSION="v0.1.0"
+
+usage() {
+  cat <<EOF
+Activate rustup toolchain. 
+
+NOTE: Only works in POSIX compatible shell.
+
+Usage: $PROG [OPTIONS]
+
+  -h, --help      Print help
+  -v, --version   Print version
+EOF
+}
+
+cli_base_args "$PROG" "$VERSION" usage "$@"
+
+#======================================
+# Main logic
+#======================================
+
+prepend_path "$HOME/.cargo/bin"

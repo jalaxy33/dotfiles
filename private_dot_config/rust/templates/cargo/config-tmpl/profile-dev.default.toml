@@ -1,0 +1,8 @@
+#======================================
+# better dev experience
+#======================================
+
+# faster dev build
+[profile.dev]
+debug = "line-tables-only" 
+

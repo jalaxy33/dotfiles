@@ -1,0 +1,88 @@
+# rustfmt.toml - with unstable features
+#
+# Most options require nightly toolchain.
+# 
+# Put this at one of:
+#     ~/rustfmt.toml                  (or  ~/.rustfmt.toml )
+#     ~/.config/rustfmt/rustfmt.toml  (or  ~/.config/rustfmt/.rustfmt.toml )
+#     <project-root>/rustfmt.toml     (or  <project-root>/.rustfmt.toml )
+# 
+#   (For Windows: change ~ to `C:\Users\<user>` or `C:\Users\<user>\AppData\Roaming` )
+#
+# Run Formatting:
+# $ cargo +nightly fmt
+# 
+# Check all format options:
+#     https://rust-lang.github.io/rustfmt/
+#
+
+style_edition = "2024"
+unstable_features = true
+
+#======================================
+# line/brace/space
+#======================================
+
+newline_style = "Unix"
+blank_lines_upper_bound=2
+spaces_around_ranges = true
+
+
+#======================================
+# struct
+#======================================
+
+# Foo {x:x, y:y}  ->  Foo {x, y}
+use_field_init_shorthand = true
+
+# put `type` and `const` first, then macros and methods
+reorder_impl_items = true
+
+
+#======================================
+# macro
+#======================================
+
+format_macro_matchers = true
+
+# replace `try!` macro by the `?` shorthand
+use_try_shorthand = true
+
+
+#======================================
+# module import
+#======================================
+
+group_imports = "StdExternalCrate"
+# "Preserve", "Crate", "Module", "Item", "One"
+imports_granularity = "Module"
+
+#======================================
+# indent 
+#======================================
+#
+# Options: "Visual" or "Block" (default)
+
+# imports_indent = "Visual"
+
+#======================================
+# comments
+#======================================
+
+format_code_in_doc_comments = true
+normalize_doc_attributes = true
+# normalize_comments = true
+
+# these options seem poorly implemented and cause churn, so, try to avoid them
+#
+# wrap_comments = true
+# comment_width = 100
+
+
+#======================================
+# trait
+#======================================
+
+# "Wide" (default) or "Compressed"
+type_punctuation_density = "Compressed"
+

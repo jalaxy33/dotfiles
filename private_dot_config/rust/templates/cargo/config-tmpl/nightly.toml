@@ -1,0 +1,13 @@
+#======================================
+# Nightly Only
+#======================================
+
+# set build flags
+[build]
+rustflags = [
+  # (Nightly) parallel type checking
+  "-Zthreads=8",
+  # (Nightly) Make the current crate share its generic instantiations
+  "-Zshare-generics=y",
+]
+

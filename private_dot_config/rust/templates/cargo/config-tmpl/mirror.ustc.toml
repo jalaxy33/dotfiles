@@ -1,0 +1,13 @@
+#======================================
+# USTC mirror
+#======================================
+
+# https://mirrors.ustc.edu.cn/help/crates.io-index.html
+[source.crates-io]
+replace-with = 'ustc'
+
+[source.ustc]
+registry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
+
+[registries.ustc]
+index = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"

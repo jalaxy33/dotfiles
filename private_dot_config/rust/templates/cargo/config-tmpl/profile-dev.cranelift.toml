@@ -1,0 +1,22 @@
+#======================================
+# cranelift
+#======================================
+
+# A faster code generator
+#
+# Please install it by rustup first:
+# $ rustup component add rustc-codegen-cranelift-preview --toolchain nightly
+# 
+# NOTE: the generated code may result in inconsistent behaviors. Please be careful.
+[unstable]
+codegen-backend = true
+
+[profile.dev]
+# switch codegen-backend to cranelift (Nightly)
+codegen-backend = "cranelift"
+# faster dev build (fewer debug info)
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+codegen-backend = "llvm"
+

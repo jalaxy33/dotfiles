@@ -1,0 +1,41 @@
+# rustfmt.toml - stable features only
+#
+# Can be used without nightly toolchain.
+# 
+# Put this at one of:
+#     ~/rustfmt.toml                  (or  ~/.rustfmt.toml )
+#     ~/.config/rustfmt/rustfmt.toml  (or  ~/.config/rustfmt/.rustfmt.toml )
+#     <project-root>/rustfmt.toml     (or  <project-root>/.rustfmt.toml )
+# 
+#   (For Windows: change ~ to `C:\Users\<user>` or `C:\Users\<user>\AppData\Roaming` )
+# 
+# Run Formatting:
+# $ cargo fmt
+# 
+# Check all format options:
+#     https://rust-lang.github.io/rustfmt/
+#
+
+style_edition = "2024"
+
+#======================================
+# line/brace/space
+#======================================
+
+newline_style = "Unix"
+
+
+#======================================
+# struct
+#======================================
+
+# Foo {x:x, y:y}  ->  Foo {x, y}
+use_field_init_shorthand = true
+
+
+#======================================
+# macro
+#======================================
+
+# replace `try!` macro by the `?` shorthand
+use_try_shorthand = true

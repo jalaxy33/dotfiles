@@ -1,0 +1,371 @@
+#!/usr/bin/env bash
+#
+# Generate `.cargo/config.toml` & 'rustfmt.toml'
+#
+
+set -euo pipefail
+
+source "$HOME/.config/rust/scripts/helper-funcs.sh"
+
+#======================================
+# CLI help info
+#======================================
+
+PROG="${0##*/}"
+VERSION="v0.1.0"
+
+usage() {
+  cat <<EOF
+Generate .cargo/config.toml & rustfmt.toml
+
+Usage: $PROG [OPTIONS]
+
+  -h, --help      Print help
+  -v, --version   Print version
+EOF
+}
+
+cli_base_args "$PROG" "$VERSION" usage "$@"
+
+#======================================
+# Important variables
+#======================================
+
+# template folders
+TMPL_ROOT="$HOME/.config/rust/templates"
+CARGO_TMPLS="$TMPL_ROOT/cargo"
+RUSTFMT_TMPLS="$TMPL_ROOT/rustfmt"
+
+COMMENT_TMPLS="$CARGO_TMPLS/comment-tmpl"
+CONFIG_TMPLS="$CARGO_TMPLS/config-tmpl"
+
+#======================================
+# Specify templates
+#======================================
+
+# starts with 'TMPL_'
+
+# header comments on top of `.cargo/config.toml`
+TMPL_header_nightly="$COMMENT_TMPLS/headers.nightly.txt"
+TMPL_header_stable="$COMMENT_TMPLS/headers.stable.txt"
+
+# cargo mirror
+TMPL_mirror_ustc="$CONFIG_TMPLS/mirror.ustc.toml"
+TMPL_mirror_cernet="$CONFIG_TMPLS/mirror.cernet.toml"
+
+# linker
+TMPL_linker="$CONFIG_TMPLS/linker.toml"
+
+# nightly-only
+TMPL_nightly="$CONFIG_TMPLS/nightly.toml"
+
+# dev profile (cranelift)
+TMPL_dev_default="$CONFIG_TMPLS/profile-dev.default.toml"
+TMPL_dev_cranelift="$CONFIG_TMPLS/profile-dev.cranelift.toml"
+
+# rustfmt
+TMPL_rustfmt_unstable="$RUSTFMT_TMPLS/rustfmt.unstable.toml"
+TMPL_rustfmt_stable="$RUSTFMT_TMPLS/rustfmt.stable.toml"
+
+#======================================
+# Helper Funcs
+#======================================
+
+# ask_workdir <label> <default>: print an existing dir on stdout, 1 on give-up
+ask_workdir() {
+  local label="$1" default="$2" workdir
+
+  if confirm " -> Save as '$default/$label'"; then
+    printf '%s\n' "$default"
+    return 0
+  fi
+
+  while true; do
+    workdir=$(collect_answer " -> Input another folder" "$default") || return 1
+    workdir="${workdir/#\~/$HOME}"
+    [[ -d $workdir ]] && {
+      printf '%s\n' "$workdir"
+      return 0
+    }
+    printf "  [Error] '%s' is not an existing folder.\n" "$workdir" >&2
+    confirm '  -> Give up saving?' "n" && return 1
+  done
+}
+
+# save_file_with_backup <target> <content>
+save_file_with_backup() {
+  local target="$1" content="$2" bak="${1%.toml}.bak.toml"
+
+  mkdir -p "$(dirname "$target")"
+
+  if [[ -e $target ]] && confirm " -> '$target' exists. Back it up as '$(basename "$bak")'?"; then
+    if [[ -e $bak ]] && ! confirm " -> '$(basename "$bak")' exists. Replace it?"; then
+      printf '  [WARN] backup skipped, the old backup is kept.\n' >&2
+    else
+      cp -p "$target" "$bak" || {
+        printf '  [Error] failed to back up %s\n' "$target" >&2
+        return 1
+      }
+      printf '  [Done] backed up to %s\n' "$bak"
+    fi
+  fi
+
+  printf '%s' "$content" >"$target"
+  printf '[Done] saved to %s\n' "$target"
+}
+
+#======================================
+# Process Funcs
+#======================================
+
+# ask if use nightly
+# return "1" when choosing nightly, otherwise "0"
+ask_nightly() {
+  if command_exist rustup && [[ -n $(rustup toolchain list | grep nightly) ]]; then
+    confirm 'Use Nightly config?' && echo "1" || echo "0"
+  else
+    echo "0"
+  fi
+}
+
+# header comments on top of .cargo/config.toml
+gen_header_comments() {
+  local text
+  local tmplfile
+  local use_nightly="${1-}"
+
+  if is_blank $use_nightly; then
+    echo "[Error] no valid 'use_nightly' argument!" >&2
+    return 1
+  fi
+
+  if is_true "$use_nightly"; then
+    # use nightly
+    tmplfile="$TMPL_header_nightly"
+  else
+    # use stable
+    tmplfile="$TMPL_header_stable"
+  fi
+
+  require_paths "$tmplfile"
+  text=$(read_trimmed $tmplfile)
+  printf "%s" "$text"
+}
+
+# cargo mirror
+gen_cargo_mirror() {
+  local text
+  local tmplfile
+
+  if choice=$(choose_from 'Choose Mirror: (a) USTC, (b) cernet, (c) No Mirror.' a a b c); then
+    case "$choice" in
+      a) tmplfile="$TMPL_mirror_ustc" ;;
+      b) tmplfile="$TMPL_mirror_cernet" ;;
+      c) tmplfile="" ;;
+    esac
+  fi
+
+  if [[ -n $tmplfile ]]; then
+    require_paths "$tmplfile"
+    text=$(read_trimmed $tmplfile)
+  fi
+
+  printf "%s" "$text"
+}
+
+# linker
+gen_linker_config() {
+  local text
+  local tmplfile="$TMPL_linker"
+
+  if ! command_exist clang || ! command_exist mold; then
+    echo "[WARN] skipping linker config: need both clang and mold" >&2
+    return 0
+  fi
+
+  if confirm 'Use mold linker?'; then
+    require_paths $tmplfile
+    text=$(read_trimmed $tmplfile)
+  fi
+  printf "%s" "$text"
+}
+
+# nightly-only
+gen_nightly_config() {
+  local text
+  local tmplfile="$TMPL_nightly"
+  local use_nightly="${1-}"
+
+  if is_blank $use_nightly; then
+    echo "[Error] no valid 'use_nightly' argument!" >&2
+    return 1
+  fi
+
+  if is_true $use_nightly && confirm 'Apply recommended nightly config?'; then
+    require_paths $tmplfile
+    text=$(read_trimmed $tmplfile)
+  fi
+  printf "%s" "$text"
+}
+
+# dev profile (cranelift)
+gen_dev_profile() {
+  local text
+  local tmplfile
+  local use_nightly="${1-}"
+  local USE_CRANELIFT="0"
+
+  if is_blank $use_nightly; then
+    echo "[Error] no valid 'use_nightly' argument!" >&2
+    return 1
+  fi
+
+  # cranelift is nightly-only
+  if is_true $use_nightly && confirm 'Use cranelift?' "n"; then
+    if ! command_exist rustup; then
+      echo "[WARN] command 'rustup' not exist! Fallback to default dev profile." &>2
+    elif [[ -z $(rustup component list | grep installed | grep cranelift) ]]; then
+      echo "[WARN] component 'cranelift' not found! Fallback to default dev profile. Install it by:" &>2
+      echo "$ rustup component add rustc-codegen-cranelift-preview --toolchain nightly"
+    else
+      USE_CRANELIFT="1"
+    fi
+  fi
+
+  if is_true $USE_CRANELIFT; then
+    # use cranelift
+    tmplfile="$TMPL_dev_cranelift"
+  else
+    # default
+    tmplfile="$TMPL_dev_default"
+  fi
+
+  require_paths $tmplfile
+  text=$(read_trimmed $tmplfile)
+  printf "%s" "$text"
+}
+
+# rustfmt
+gen_rustfmt() {
+  local text
+  local tmplfile
+  local use_nightly="${1-}"
+
+  if is_blank $use_nightly; then
+    echo "[Error] no valid 'use_nightly' argument!" >&2
+    return 1
+  fi
+
+  if is_true $use_nightly; then
+    # use unstable
+    tmplfile="$TMPL_rustfmt_unstable"
+  else
+    # use stable
+    tmplfile="$TMPL_rustfmt_stable"
+  fi
+
+  require_paths "$tmplfile"
+  text=$(read_trimmed $tmplfile)
+  printf "%s" "$text"
+}
+
+# save '.cargo/config.toml'
+save_cargo_config() {
+  confirm "Save '.cargo/config.toml'?" || return 0
+  local workdir
+  workdir=$(ask_workdir '.cargo/config.toml' "$HOME") || return 0
+  save_file_with_backup "$workdir/.cargo/config.toml" "$BODY"
+  echo ""
+}
+
+# save 'rustfmt.toml'
+save_rustfmt() {
+  confirm "Save 'rustfmt.toml'?" || return 0
+  local workdir
+  workdir=$(ask_workdir 'rustfmt.toml' "$HOME/.config/rustfmt") || return 0
+  save_file_with_backup "$workdir/rustfmt.toml" "$RUSTFMT_BODY"
+  echo ""
+}
+
+#======================================
+# Precheck
+#======================================
+
+# make sure related paths exist
+require_paths "$TMPL_ROOT" "$CARGO_TMPLS" "$RUSTFMT_TMPLS" "$COMMENT_TMPLS" "$CONFIG_TMPLS"
+
+# ensure `~/.cargo`
+if [ ! -d "$HOME/.cargo" ]; then
+  echo "[WARN] missing '$HOME/.cargo'!"
+  echo "[Running] mkdir -p $HOME/.cargo"
+  mkdir -p "$HOME/.cargo"
+fi
+
+#======================================
+# Compose configs
+#======================================
+
+echo ""
+echo "> generating '.cargo/config.toml' & 'rustfmt.toml'"
+echo ""
+
+BODY=""
+RUSTFMT_BODY=""
+
+# ask if use nightly toolchain
+USE_NIGHTLY=$(ask_nightly)
+
+# header comments on top of .cargo/config.toml
+PART_header=$(gen_header_comments $USE_NIGHTLY)$'\n'
+is_blank $PART_header || BODY+=$PART_header
+
+# cargo mirror
+PART_mirror=$(gen_cargo_mirror)$'\n'
+is_blank $PART_mirror || BODY+=$'\n'$PART_mirror
+
+# linker
+PART_linker=$(gen_linker_config)$'\n'
+is_blank $PART_linker || BODY+=$'\n'$PART_linker
+
+# nightly-only
+PART_nightly=$(gen_nightly_config $USE_NIGHTLY)$'\n'
+is_blank $PART_nightly || BODY+=$'\n'$PART_nightly
+
+# dev profile (cranelift)
+PART_dev=$(gen_dev_profile $USE_NIGHTLY)$'\n'
+is_blank $PART_dev || BODY+=$'\n'$PART_dev
+
+# rustfmt
+RUSTFMT_BODY=$(gen_rustfmt $USE_NIGHTLY)$'\n'
+
+echo ""
+echo "> '.cargo/config.toml' & 'rustfmt.toml' are generated."
+echo ""
+
+#======================================
+# Save configs
+#======================================
+
+# save '.cargo/config.toml'
+save_cargo_config
+
+# save 'rustfmt.toml'
+save_rustfmt
+
+#======================================
+# Display configs
+#======================================
+
+if confirm "Display the generated '.cargo/config.toml'?" "n"; then
+  printf "\n-----[ .cargo/config.toml ]---------------------\n"
+  printf "\n%s" "$BODY"
+  printf "\n------------------------------------------------\n"
+  echo ""
+fi
+
+if confirm "Display the generated 'rustfmt.toml'?" "n"; then
+  printf "\n-----[ rustfmt.toml ]---------------------------\n"
+  printf "\n%s" "$RUSTFMT_BODY"
+  printf "\n------------------------------------------------\n"
+  echo ""
+fi
