@@ -22,5 +22,9 @@ prepend_path "$HOME/.local/bin"
 SCRIPTS_DIR="$HOME/.local/bin/scripts"
 [ -d $SCIRPTS_DIR ] && prepend_path $SCRIPTS_DIR || echo "Warning: $SCIRPTS_DIR not exists!"
 
+# Add custom rust-related commands
+RUST_SCRIPTS_BIN="$HOME/.config/rust/scripts/bin"
+[ -d $RUST_SCRIPTS_BIN ] && prepend_path $RUST_SCRIPTS_BIN
+
 # archlinux specific
 is_archlinux && prepend_path "$HOME/.local/bin/archbin"
