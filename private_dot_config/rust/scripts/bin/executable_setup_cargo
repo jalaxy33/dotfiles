@@ -20,12 +20,40 @@ Generate .cargo/config.toml & rustfmt.toml
 
 Usage: $PROG [OPTIONS]
 
+META OPTIONS:
   -h, --help      Print help
   -v, --version   Print version
+
+TOOLCHAIN OPTIONS
+  -T, --toolchain <TOOLCHAIN>   Specify rust toolchain [possible values: stable, nightly]
 EOF
 }
 
 cli_base_args "$PROG" "$VERSION" usage "$@"
+
+TOOLCHAIN=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -T | --toolchain)
+      if [[ -z ${2-} ]]; then
+        printf "error: %s needs a value (stable|nightly)\n" "$1" >&2
+        exit 1
+      fi
+      TOOLCHAIN="$2"
+      shift 2
+      ;;
+    --toolchain=*)
+      TOOLCHAIN="${1#*=}"
+      shift
+      ;;
+    *)
+      printf "error: unknown option: %s\n" "$1" >&2
+      exit 1
+      ;;
+  esac
+done
+
+require_valid_optional_cli_arg "-T, --toolchain" "$TOOLCHAIN" "stable" "nightly"
 
 #======================================
 # Important variables
@@ -70,6 +98,10 @@ TMPL_rustfmt_stable="$RUSTFMT_TMPLS/rustfmt.stable.toml"
 #======================================
 # Helper Funcs
 #======================================
+
+is_nightly_toolchain_available() {
+  command_exist rustup && [[ -n $(rustup toolchain list | grep nightly) ]]
+}
 
 # ask_workdir <label> <default>: print an existing dir on stdout, 1 on give-up
 ask_workdir() {
@@ -121,8 +153,29 @@ save_file_with_backup() {
 # ask if use nightly
 # return "1" when choosing nightly, otherwise "0"
 ask_nightly() {
-  if command_exist rustup && [[ -n $(rustup toolchain list | grep nightly) ]]; then
+  if is_nightly_toolchain_available; then
     confirm 'Use Nightly config?' && echo "1" || echo "0"
+  else
+    echo "0"
+  fi
+}
+
+# Parse toolchain CLI argument.
+# Return "1" for nightly, "0" for stable.
+#
+# Usage:
+# $ parse_toolchain_arg $TOOLCHAIN
+parse_toolchain_arg() {
+  local toolchain="${1-}"
+
+  if ! isin "$toolchain" stable nightly; then
+    echo "[Error] invalid toolchain argument: '$toolchain'. (options: stable nightly)" >&2
+    exit 1
+  fi
+
+  # Verify nightly toolchain. Switch to stable if unavailable.
+  if [[ $toolchain == "nightly" ]]; then
+    is_nightly_toolchain_available && echo "1" || echo "0"
   else
     echo "0"
   fi
@@ -134,9 +187,9 @@ gen_header_comments() {
   local tmplfile
   local use_nightly="${1-}"
 
-  if is_blank $use_nightly; then
-    echo "[Error] no valid 'use_nightly' argument!" >&2
-    return 1
+  if ! isin "$use_nightly" "0" "1"; then
+    echo "[Error] no valid 'use_nightly' argument: '$use_nightly'" >&2
+    exit 1
   fi
 
   if is_true "$use_nightly"; then
@@ -196,9 +249,9 @@ gen_nightly_config() {
   local tmplfile="$TMPL_nightly"
   local use_nightly="${1-}"
 
-  if is_blank $use_nightly; then
-    echo "[Error] no valid 'use_nightly' argument!" >&2
-    return 1
+  if ! isin "$use_nightly" "0" "1"; then
+    echo "[Error] no valid 'use_nightly' argument: '$use_nightly'" >&2
+    exit 1
   fi
 
   if is_true $use_nightly && confirm 'Apply recommended nightly config?'; then
@@ -215,9 +268,9 @@ gen_dev_profile() {
   local use_nightly="${1-}"
   local USE_CRANELIFT="0"
 
-  if is_blank $use_nightly; then
-    echo "[Error] no valid 'use_nightly' argument!" >&2
-    return 1
+  if ! isin "$use_nightly" "0" "1"; then
+    echo "[Error] no valid 'use_nightly' argument: '$use_nightly'" >&2
+    exit 1
   fi
 
   # cranelift is nightly-only
@@ -251,9 +304,9 @@ gen_rustfmt() {
   local tmplfile
   local use_nightly="${1-}"
 
-  if is_blank $use_nightly; then
-    echo "[Error] no valid 'use_nightly' argument!" >&2
-    return 1
+  if ! isin "$use_nightly" "0" "1"; then
+    echo "[Error] no valid 'use_nightly' argument: '$use_nightly'" >&2
+    exit 1
   fi
 
   if is_true $use_nightly; then
@@ -312,8 +365,14 @@ echo ""
 BODY=""
 RUSTFMT_BODY=""
 
-# ask if use nightly toolchain
-USE_NIGHTLY=$(ask_nightly)
+# make sure which toolchain to use
+if [[ -n $TOOLCHAIN ]]; then
+  # parse '--toolchain' argument if provided
+  USE_NIGHTLY=$(parse_toolchain_arg $TOOLCHAIN)
+else
+  # ask if use nightly toolchain
+  USE_NIGHTLY=$(ask_nightly)
+fi
 
 # header comments on top of .cargo/config.toml
 PART_header=$(gen_header_comments $USE_NIGHTLY)$'\n'

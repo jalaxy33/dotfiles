@@ -23,6 +23,7 @@ NOTE: Only works in POSIX compatible shell.
 
 Usage: $PROG [OPTIONS]
 
+META OPTIONS:
   -h, --help      Print help
   -v, --version   Print version
 EOF

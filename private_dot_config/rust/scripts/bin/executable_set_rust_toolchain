@@ -23,12 +23,40 @@ Select default rust toolchain.
 
 Usage: $PROG [OPTIONS]
 
+META OPTIONS:
   -h, --help      Print help
   -v, --version   Print version
+
+TOOLCHAIN OPTIONS
+  -T, --toolchain <TOOLCHAIN>   Specify rust toolchain [possible values: stable, nightly]
 EOF
 }
 
 cli_base_args "$PROG" "$VERSION" usage "$@"
+
+TOOLCHAIN=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -T | --toolchain)
+      if [[ -z ${2-} ]]; then
+        printf "error: %s needs a value (stable|nightly)\n" "$1" >&2
+        exit 1
+      fi
+      TOOLCHAIN="$2"
+      shift 2
+      ;;
+    --toolchain=*)
+      TOOLCHAIN="${1#*=}"
+      shift
+      ;;
+    *)
+      printf "error: unknown option: %s\n" "$1" >&2
+      exit 1
+      ;;
+  esac
+done
+
+require_valid_optional_cli_arg "-T, --toolchain" "$TOOLCHAIN" "stable" "nightly"
 
 #======================================
 # Helper funcs
@@ -44,14 +72,41 @@ ask_nightly() {
   fi
 }
 
+# Parse toolchain CLI argument.
+# Return "1" for nightly, "0" for stable.
+#
+# Usage:
+# $ parse_toolchain_arg $TOOLCHAIN
+parse_toolchain_arg() {
+  local toolchain="${1-}"
+
+  if ! isin "$toolchain" stable nightly; then
+    echo "[Error] invalid toolchain argument: '$toolchain'. (options: stable nightly)" >&2
+    exit 1
+  fi
+
+  # Verify nightly toolchain. Switch to stable if unavailable.
+  if [[ $toolchain == "nightly" ]]; then
+    is_nightly_toolchain_available && echo "1" || echo "0"
+  else
+    echo "0"
+  fi
+}
+
 #======================================
 # Main logics
 #======================================
 
 printf "\n==== setup: default toolchain ====\n\n"
 
-# ask if use nightly toolchain
-USE_NIGHTLY=$(ask_nightly)
+# make sure which toolchain to use
+if [[ -n $TOOLCHAIN ]]; then
+  # parse '--toolchain' argument if provided
+  USE_NIGHTLY=$(parse_toolchain_arg $TOOLCHAIN)
+else
+  # ask if use nightly toolchain
+  USE_NIGHTLY=$(ask_nightly)
+fi
 
 # set toolchain
 if is_true $USE_NIGHTLY; then
@@ -64,5 +119,10 @@ fi
 
 # setup configs
 printf "\n==== generate: config files ====\n"
-printf "\n[Running] setup_cargo\n"
-setup_cargo
+if is_true $USE_NIGHTLY; then
+  printf "\n[Running] setup_cargo --toolchain nightly\n"
+  setup_cargo --toolchain nightly
+else
+  printf "\n[Running] setup_cargo --toolchain stable\n"
+  setup_cargo --toolchain stable
+fi
