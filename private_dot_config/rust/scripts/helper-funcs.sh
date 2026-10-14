@@ -25,33 +25,6 @@ prepend_path() {
 }
 
 #======================================
-# CLI
-#======================================
-
-# cli_base_args <prog> <version> <usage-func> [args...]: help/version -> print, exit 0.
-# Other args are left to the caller.
-# e.g. cli_base_args "$PROG" "$VERSION" usage "$@"
-cli_base_args() {
-  local prog="$1" version="$2" usage_fn="$3"
-  shift 3
-
-  local opt
-  for opt in "$@"; do
-    case "$opt" in
-      --) break ;;
-      -h | --help)
-        "$usage_fn"
-        exit 0
-        ;;
-      -v | --version)
-        printf '%s %s\n' "$prog" "$version"
-        exit 0
-        ;;
-    esac
-  done
-}
-
-#======================================
 # Checker
 #======================================
 
@@ -80,6 +53,94 @@ is_true() {
 # e.g. command_exist ls && echo "exist"
 command_exist() {
   command -v "${1-}" >/dev/null 2>&1
+}
+
+# check if given value in list
+#
+# Usage:
+# $ isin "$val" "${list[@]}"
+#
+# e.g. isin apple apple banana orange
+isin() {
+  local value="$1"
+  shift
+  local item
+  for item in "$@"; do
+    [[ $item == "$value" ]] && return 0
+  done
+  return 1
+}
+
+#======================================
+# CLI
+#======================================
+
+# cli_base_args <prog> <version> <usage-func> [args...]: help/version -> print, exit 0.
+# Other args are left to the caller.
+# e.g. cli_base_args "$PROG" "$VERSION" usage "$@"
+cli_base_args() {
+  local prog="$1" version="$2" usage_fn="$3"
+  shift 3
+
+  local opt
+  for opt in "$@"; do
+    case "$opt" in
+      --) break ;;
+      -h | --help)
+        "$usage_fn"
+        exit 0
+        ;;
+      -v | --version)
+        printf '%s %s\n' "$prog" "$version"
+        exit 0
+        ;;
+    esac
+  done
+}
+
+# Check if the provided command-line argument valid.
+# Return 0 when valid, otherwise 1.
+#
+# Usage:
+# $ is_valid_cli_arg "$arg" opt1 opt2 ... || echo "invalid"
+is_valid_cli_arg() {
+  local value="$1" opt
+  shift
+  for opt in "$@"; do
+    [[ $opt == "$value" ]] && return 0
+  done
+  return 1
+}
+
+# Make sure given command-line argument is valid. Otherwise exit
+#
+# Usage:
+# $ require_valid_cli_arg "info" "$arg" opt1 opt2...
+#
+# "info" should be something like "-h, --help"
+require_valid_cli_arg() {
+  local info="$1"
+  local value="$2"
+  shift 2
+  if ! is_valid_cli_arg "$value" "$@"; then
+    echo "[Error] Invalid argument for '$info', received '$value' (options: $@)" >&2
+    exit 1
+  fi
+}
+
+# Make sure given command-line argument is valid.
+# Pass when it is valid or empty, otherwise exit
+#
+# Usage:
+# $ require_valid_cli_arg "info" "$arg" opt1 opt2...
+#
+# "info" should be something like "-h, --help"
+require_valid_optional_cli_arg() {
+  local info="$1"
+  local value="$2"
+  shift 2
+  # skip checking if it is empty
+  is_blank $value && return 0 || require_valid_cli_arg "$info" "$value" "$@"
 }
 
 #======================================

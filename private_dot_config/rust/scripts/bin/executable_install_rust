@@ -22,6 +22,7 @@ Install and config rust toolchains.
 
 Usage: $PROG [OPTIONS]
 
+META OPTIONS:
   -h, --help      Print help
   -v, --version   Print version
 EOF
