@@ -5,7 +5,7 @@
 # Usage:
 #   proxy_ok && echo "online" || echo "offline"
 #
+TIMEOUT=5
+TEST_URL="https://www.google.com/"
 
-curl -fsI --connect-timeout 3 --max-time 5 -o /dev/null https://www.google.com \
-  || curl -fsI --connect-timeout 3 --max-time 5 -o /dev/null https://www.youtube.com \
-  || curl -fsI --connect-timeout 3 --max-time 5 -o /dev/null https://www.cloudflare.com
+curl -I -s -m $TIMEOUT -o /dev/null "$TEST_URL"
