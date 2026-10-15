@@ -36,6 +36,9 @@
   },
   // agent面板
   "agent": {
+    "threads_sidebar": {
+      "position": "right",
+    },
     "inline_assistant_model": {
       "provider": "deepseek",
       "model": "deepseek-v4-pro",
@@ -50,7 +53,6 @@
     },
     "show_turn_stats": true,
     "notify_when_agent_waiting": "all_screens",
-    "sidebar_side": "right",
     "dock": "right",
     "favorite_models": [],
     "model_parameters": [],
@@ -124,19 +126,6 @@
   "auto_update": false,
   "cli_default_open_behavior": "new_window",
 
-  // -- 编程语言设置 --
-  "languages": {
-    "Markdown-Inline": {
-      "tab_size": 2,
-    },
-    "Markdown": {
-      "tab_size": 2,
-    },
-    "Lua": {
-      "tab_size": 2,
-    },
-  },
-
   // -- 外观主题 --
   "icon_theme": {
     "mode": "dark",
@@ -148,5 +137,47 @@
     "light": "Gruvbox Light",
     // 需要安装 `Github Theme` 插件
     "dark": "GitHub Dark Dimmed",
+  },
+
+  // -- 编程语言设置 --
+  "languages": {
+    "Markdown-Inline": {
+      "tab_size": 2,
+    },
+    "Markdown": {
+      "tab_size": 2,
+    },
+    "Lua": {
+      "tab_size": 2,
+    },
+
+    "Shell Script": {
+      "tab_size": 2,
+    },
+  },
+
+  "lsp": {
+    "rust-analyzer": {
+      "initialization_options": {
+        // get more cargo-less diagnostics from rust-analyzer,
+        // which might include false-positives (those can be turned off by their names)
+        "diagnostics": {
+          "experimental": {
+            "enable": true,
+          },
+        },
+        // To disable the checking entirely
+        // (ignores all cargo and check settings below)
+        "checkOnSave": false,
+        // To check the `lib` target only.
+        "cargo": {
+          "allTargets": false,
+        },
+        // Use `-p` instead of `--workspace` for cargo check
+        "check": {
+          "workspace": false,
+        },
+      },
+    },
   },
 }
