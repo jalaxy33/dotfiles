@@ -183,8 +183,8 @@ parse_toolchain_arg() {
 
 # header comments on top of .cargo/config.toml
 gen_header_comments() {
-  local text
-  local tmplfile
+  local text=""
+  local tmplfile=""
   local use_nightly="${1-}"
 
   if ! isin "$use_nightly" "0" "1"; then
@@ -207,8 +207,8 @@ gen_header_comments() {
 
 # cargo mirror
 gen_cargo_mirror() {
-  local text
-  local tmplfile
+  local text=""
+  local tmplfile=""
 
   if choice=$(choose_from 'Choose Mirror: (a) USTC, (b) cernet, (c) No Mirror.' a a b c); then
     case "$choice" in
@@ -228,7 +228,7 @@ gen_cargo_mirror() {
 
 # linker
 gen_linker_config() {
-  local text
+  local text=""
   local tmplfile="$TMPL_linker"
 
   if ! command_exist clang || ! command_exist mold; then
@@ -245,7 +245,7 @@ gen_linker_config() {
 
 # nightly-only
 gen_nightly_config() {
-  local text
+  local text=""
   local tmplfile="$TMPL_nightly"
   local use_nightly="${1-}"
 
@@ -263,8 +263,8 @@ gen_nightly_config() {
 
 # dev profile (cranelift)
 gen_dev_profile() {
-  local text
-  local tmplfile
+  local text=""
+  local tmplfile=""
   local use_nightly="${1-}"
   local USE_CRANELIFT="0"
 
@@ -300,8 +300,8 @@ gen_dev_profile() {
 
 # rustfmt
 gen_rustfmt() {
-  local text
-  local tmplfile
+  local text=""
+  local tmplfile=""
   local use_nightly="${1-}"
 
   if ! isin "$use_nightly" "0" "1"; then

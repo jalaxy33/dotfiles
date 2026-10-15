@@ -55,7 +55,7 @@ use_try_shorthand = true
 
 group_imports = "StdExternalCrate"
 # "Preserve", "Crate", "Module", "Item", "One"
-imports_granularity = "Module"
+imports_granularity = "Crate"
 
 #======================================
 # indent 
@@ -63,7 +63,7 @@ imports_granularity = "Module"
 #
 # Options: "Visual" or "Block" (default)
 
-# imports_indent = "Visual"
+imports_indent = "Visual"
 
 #======================================
 # comments
