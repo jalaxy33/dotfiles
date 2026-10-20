@@ -39,10 +39,10 @@ alias nv="nvim"
 
 # command abbrs
 alias fa="fastfetch"
-alias lg="lazygit"
 alias grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
-alias clc="claude"
-alias oc="opencode"
+
+command_exists lazygit && alias lg="lazygit"
+command_exists lazyjj && alias lj="lazyjj"
 
 # reboot/poweroff
 alias reboot="sudo systemctl reboot"
@@ -99,6 +99,11 @@ fi
 if command_exists chezmoi; then
   alias nirichezmoi="chezmoi -S $HOME/.local/share/chezmoi-niri/"
 fi
+
+# lazygit
+
+# lazyjj
+command_exists lazyjj && alias lj="lazyjj"
 
 # ==========================================
 # alias functions
