@@ -74,6 +74,8 @@ pac_depends=(
   "bash-completion"
   "nodejs"
   "npm"
+  "jujutsu"
+  "lazyjj"
   # rust depends
   "mold"
   "clang"

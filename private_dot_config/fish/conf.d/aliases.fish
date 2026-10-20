@@ -15,10 +15,10 @@ alias nv='nvim'
 
 # command abbrs
 abbr fa fastfetch
-abbr lg lazygit
 abbr grub 'sudo grub-mkconfig -o /boot/grub/grub.cfg'
-abbr clc claude
-abbr oc opencode
+
+command -q lazygit && abbr lg lazygit
+command -q lazyjj && abbr lj lazyjj
 
 # reboot/poweroff
 abbr reboot "sudo systemctl reboot"

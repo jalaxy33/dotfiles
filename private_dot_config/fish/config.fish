@@ -13,6 +13,7 @@
 #
 # Optional but useful:
 #  - bat, helix, rsync, neovim, fastfetch, lazygit
+#  - jujutsu, lazyjj
 
 if status is-interactive
     # Commands to run in interactive sessions can go here
