@@ -37,17 +37,19 @@ source "$HOME/.config/zsh/zsh_aliases.zsh"
 BREW_CMD="/home/linuxbrew/.linuxbrew/bin/brew"
 [[ -f $BREW_CMD ]] && eval "$($BREW_CMD shellenv)"
 
-# activate zimfw or starship
+# uncomment to use zimfw
 activate_zimfw
-[[ ! is_zimfw_loaded ]] && command_exists starship && eval "$(starship init zsh)"
+
+# do if not using zimfw
+if ! is_zimfw_loaded; then
+  # fix: command not found: compdef
+  autoload -Uz compinit && compinit
+
+  # starship is unnecessary when using zimfw
+  command_exists starship && eval "$(starship init zsh)"
+fi
 
 # init apps
 command_exists zoxide && eval "$(zoxide init zsh --cmd cd)"
 command_exists fzf && source <(fzf --zsh)
-
-#==========================================
-# zsh specific
-#==========================================
-
-# fix: command not found: compdef
-[[ ! is_zimfw_loaded ]] && autoload -Uz compinit && compinit
+command_exists jj && source <(jj util completion zsh)

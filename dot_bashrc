@@ -35,6 +35,7 @@ BREW_CMD="/home/linuxbrew/.linuxbrew/bin/brew"
 command_exists starship && eval "$(starship init bash)"
 command_exists zoxide && eval "$(zoxide init bash --cmd cd)"
 command_exists fzf && eval "$(fzf --bash)"
+command_exists jj && source <(jj util completion bash)
 
 #==========================================
 # Bash specific
