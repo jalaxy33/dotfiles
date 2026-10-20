@@ -76,6 +76,7 @@ set_rust_toolchain
 tool_list=(
   "cargo-cache"
   "cargo-update"
+  "cargo-binstall"
 )
 
 if [[ ${#tool_list[@]} -ne 0 ]]; then
