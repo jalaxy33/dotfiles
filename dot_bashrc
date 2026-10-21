@@ -32,8 +32,7 @@ source "$BASH_CONFIGS/languages.sh"
 #==========================================
 
 # try to activate homebrew (if installed)
-BREW_CMD="/home/linuxbrew/.linuxbrew/bin/brew"
-[[ -f $BREW_CMD ]] && eval "$($BREW_CMD shellenv)"
+command_exists brew && eval "$(brew shellenv)"
 
 # init apps
 command_exists starship && eval "$(starship init bash)"

@@ -3,6 +3,11 @@
 # env.sh -- Setting environment variables for bash
 #
 
+# skip if loaded
+[[ -n ${__ENV_SH_LOADED:-} ]] && return 0
+readonly __ENV_SH_LOADED=1
+
+# import helpers
 case ${ZSH_VERSION-} in
   '') _src=${BASH_SOURCE:-$0} ;;   # bash
   *)  _src=${(%):-%x} ;;           # zsh
@@ -12,12 +17,6 @@ unset _src
 
 source "$CURRENT_DIR/functions.sh"
 source "$CURRENT_DIR/paths.sh"
-
-# skip if loaded
-if [[ -n ${__ENV_SH_LOADED:-} ]]; then
-  return 0
-fi
-readonly __ENV_SH_LOADED=1
 
 #======================================
 # apps

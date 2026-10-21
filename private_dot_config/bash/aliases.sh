@@ -3,6 +3,11 @@
 # aliases.sh -- command aliases
 #
 
+# skip if loaded
+[[ -n ${__ALIASES_SH_LOADED:-} ]] && return 0
+readonly __ALIASES_SH_LOADED=1
+
+# import helpers
 case ${ZSH_VERSION-} in
   '') _src=${BASH_SOURCE:-$0} ;;   # bash
   *)  _src=${(%):-%x} ;;           # zsh
@@ -12,12 +17,6 @@ unset _src
 
 source "$CURRENT_DIR/functions.sh"
 source "$CURRENT_DIR/paths.sh"
-
-# skip if loaded
-if [[ -n ${__ALIASES_SH_LOADED:-} ]]; then
-  return 0
-fi
-readonly __ALIASES_SH_LOADED=1
 
 # ==========================================
 # system commands
