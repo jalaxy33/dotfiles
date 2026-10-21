@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+#
+# proxy_ok -- Check if the proxy is working.
+#
+set -euo pipefail
+
+TIMEOUT=5
+TEST_URL="https://www.google.com/"
+
+# ==========================================
+# CLI args
+# ==========================================
+
+show_usage() {
+  cat <<EOF
+Usage: proxy_ok
+
+Send a HEAD request to $TEST_URL (5s timeout) and succeed only when the
+response status line reports HTTP 200, e.g. "HTTP/2 200" or "HTTP/1.1 200 OK".
+
+  proxy_ok && echo "online" || echo "offline"
+
+Exit status:
+  0  got HTTP 200
+  1  request failed, status is not 200, or bad usage
+
+Options:
+  -h, --help      Show this help
+EOF
+}
+
+case "${1:-}" in
+  -h | --help)
+    show_usage
+    exit 0
+    ;;
+  "") ;;
+  *)
+    echo "Error: Unknown argument '$1'. Use --help." >&2
+    exit 1
+    ;;
+esac
+
+# ==========================================
+# Main logic
+# ==========================================
+
+# Use the last status line: behind a proxy, curl also prints the CONNECT reply
+# Keep reason phrases in mind: both "HTTP/2 200" and "HTTP/1.1 200 OK" are ok
+status_line=$(curl -I -s -m "$TIMEOUT" "$TEST_URL" 2>/dev/null |
+  awk '{sub(/[[:space:]]+$/, "")} /^HTTP\// {line = $0} END {print line}') || status_line=""
+
+[[ $status_line =~ ^HTTP/[0-9.]+[[:space:]]+([0-9]{3})([[:space:]]|$) ]] &&
+  [[ ${BASH_REMATCH[1]} == 200 ]] && exit 0
+exit 1

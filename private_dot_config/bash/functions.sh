@@ -13,17 +13,6 @@ readonly __FUNCTIONS_SH_LOADED=1
 # Helper Functions
 # ==========================================
 
-# command_exists - check if a command exists
-# Usage: command_exists <command_name>
-# Returns: 0 if command exists, 1 if not, 2 if argument missing
-command_exists() {
-  if [ $# -ne 1 ]; then
-    echo "Usage: command_exists <command_name>" >&2
-    return 2
-  fi
-  command -v "$1" >/dev/null 2>&1
-}
-
 # prepend_path - Prepend dirs to PATH if exist and missing;
 #  usage: prepend_path dir1 [dir2...]
 prepend_path() {
@@ -37,6 +26,7 @@ prepend_path() {
   export PATH
   return 0
 }
+
 
 # Source FILE(s) if they exist and are readable.
 # Usage: try_source FILE [FILE...]
@@ -158,32 +148,4 @@ load_dotenv() {
   done <"$file"
 
   return $has_error
-}
-
-# ==========================================
-# OS specific
-# ==========================================
-
-# Check if running on Arch Linux or an Arch-based distro
-# (matches ID=arch, or any distro with "arch" in ID_LIKE).
-# Returns 0 on match, 1 otherwise.
-#
-# Usage:
-#   if is_archlinux; then
-#       echo "on Arch"
-#   fi
-#
-#   is_archlinux && pacman -Syu
-is_archlinux() {
-  [[ -r /etc/os-release ]] || return 1
-  local id like
-  id=$(
-    . /etc/os-release 2>/dev/null
-    printf '%s' "$ID"
-  )
-  like=$(
-    . /etc/os-release 2>/dev/null
-    printf '%s' "$ID_LIKE"
-  )
-  [[ $id == arch || $like == *arch* ]]
 }

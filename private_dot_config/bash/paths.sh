@@ -3,7 +3,9 @@
 # paths.sh -- Add paths to $env:PATH
 #
 
-source "$HOME/.config/bash/functions.sh"
+CURRENT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+
+source "$CURRENT_DIR/functions.sh"
 
 # skip if loaded
 if [[ -n ${__PATHS_SH_LOADED:-} ]]; then
@@ -15,16 +17,22 @@ readonly __PATHS_SH_LOADED=1
 # Set Paths
 # ==========================================
 
-# Add `~/.local/bin` to PATH
-prepend_path "$HOME/.local/bin"
+# add `~/.local/bin` to PATH
+LOCAL_BINS="$HOME/.local/bin"
+[ -d $LOCAL_BINS ] && prepend_path "$LOCAL_BINS"
 
-# Add custom executable scripts to PATH: `~/.local/bin/scripts/`
-SCRIPTS_DIR="$HOME/.local/bin/scripts"
-[ -d $SCIRPTS_DIR ] && prepend_path $SCRIPTS_DIR || echo "Warning: $SCIRPTS_DIR not exists!"
+# add custom executables to PATH: ./scripts/bin/
+SCRIPT_BINS="$CURRENT_DIR/scripts/bin"
+[ -d $SCRIPT_BINS ] && prepend_path $SCRIPT_BINS || echo "warning: $SCRIPT_BINS not exists"
 
-# Add custom rust-related commands
+# add custom rust-related commands
 RUST_SCRIPTS_BIN="$HOME/.config/rust/scripts/bin"
-[ -d $RUST_SCRIPTS_BIN ] && prepend_path $RUST_SCRIPTS_BIN
+[ -d $RUST_SCRIPTS_BIN ] && prepend_path $RUST_SCRIPTS_BIN || echo "warning: $RUST_SCRIPTS_BIN not exists!"
 
-# archlinux specific
-is_archlinux && prepend_path "$HOME/.local/bin/archbin"
+#
+# OS specific
+#---------------------------------
+
+# archlinux specific: ./scripts/archbin/
+ARCHBINS="$CURRENT_DIR/scripts/archbin"
+$ARCHBINS/is_archlinux && prepend_path $ARCHBINS

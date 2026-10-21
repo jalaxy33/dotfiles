@@ -3,7 +3,9 @@
 # languages.sh -- languages related settings
 #
 
-source "$HOME/.config/bash/functions.sh"
+CURRENT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+
+source "$CURRENT_DIR/functions.sh"
 
 # skip if loaded
 if [[ -n ${__LANGUAGES_SH_LOADED:-} ]]; then

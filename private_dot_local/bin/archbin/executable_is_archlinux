@@ -4,11 +4,7 @@
 # Exit 0 on match, 1 otherwise.
 #
 # Usage:
-#   is_archlinux && pacman -Syu
-#
-#   if is_archlinux; then
-#       echo "on Arch"
-#   fi
+# $ is_archlinux && echo "on arch" || echo "not on arch"
 
 [[ -r /etc/os-release ]] || exit 1
 

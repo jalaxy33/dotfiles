@@ -3,7 +3,10 @@
 # env.sh -- Setting environment variables for bash
 #
 
-source "$HOME/.config/bash/functions.sh"
+CURRENT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+
+source "$CURRENT_DIR/functions.sh"
+source "$CURRENT_DIR/paths.sh"
 
 # skip if loaded
 if [[ -n ${__ENV_SH_LOADED:-} ]]; then

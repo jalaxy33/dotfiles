@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# command_exists - Check whether a command is available
+set -euo pipefail
+
+# ==========================================
+# CLI args
+# ==========================================
+
+show_usage() {
+  cat <<EOF
+Usage: command_exists <command_name>
+
+Exit status:
+  0  command exists
+  1  command does not exist, or bad usage
+
+Options:
+  -h, --help      Show this help
+
+Examples:
+  command_exists git && echo "git is available"
+EOF
+}
+
+[ $# -eq 1 ] || {
+  echo "Usage: command_exists <command_name>" >&2
+  exit 1
+}
+
+case "$1" in
+  -h | --help)
+    show_usage
+    exit 0
+    ;;
+esac
+
+# ==========================================
+# Main logic
+# ==========================================
+
+command -v -- "$1" >/dev/null 2>&1

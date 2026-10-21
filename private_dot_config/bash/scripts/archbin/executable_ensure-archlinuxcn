@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+#
+# ensure-archlinuxcn - add archlinuxcn mirror if missing.
+#
+set -euo pipefail
+
+CURRENT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+
+# add current dir to PATH
+PATH="$CURRENT_DIR:$PATH"
+
+# ==========================================
+# CLI args
+# ==========================================
+
+usage() {
+  cat <<'EOF'
+Usage: ensure-archlinuxcn [OPTION]
+
+Add the archlinuxcn mirror to /etc/pacman.conf when missing,
+then install archlinuxcn-keyring. Must run on Arch Linux.
+
+Options:
+  -h, --help  show this help and exit
+EOF
+}
+
+for arg in "$@"; do
+  case $arg in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "ensure-archlinuxcn: unknown option: $arg" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+# ==========================================
+# Precheck
+# ==========================================
+
+ensure_command() {
+  local cmd="$1"
+  if [[ ! -f $cmd || ! -x $cmd ]]; then
+    SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
+    echo "$SCRIPT_NAME: error: $cmd missing or not executable." >&2
+    exit 1
+  fi
+}
+
+# check if helper commands exist
+ensure_command "$CURRENT_DIR/is_archlinux"
+
+# exit when not archlinux
+if ! is_archlinux; then
+  SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
+  echo "$SCRIPT_NAME: error: This script only support archlinux!" >&2
+  exit 1
+fi
+
+# ==========================================
+# Main Logic
+# ==========================================
+
+CONF=/etc/pacman.conf
+SUDO=$([ "$EUID" -eq 0 ] && echo "" || echo "sudo")
+
+echo ""
+echo "=====  mirror: archlinuxcn  ======"
+echo ""
+
+if ! grep -qE '^[[:space:]]*\[archlinuxcn\]' "$CONF"; then
+  $SUDO tee -a "$CONF" >/dev/null <<'EOF'
+
+[archlinuxcn]
+Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
+Server = https://mirrors.hit.edu.cn/archlinuxcn/$arch
+Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch
+Server = https://repo.huaweicloud.com/archlinuxcn/$arch
+EOF
+  echo "Added archlinuxcn mirror."
+else
+  echo "archlinuxcn mirror already added."
+fi
+
+echo
+echo "[Running] $SUDO pacman -Sy --needed --noconfirm archlinuxcn-keyring"
+$SUDO pacman -Sy --needed --noconfirm archlinuxcn-keyring
+
+echo "Done."

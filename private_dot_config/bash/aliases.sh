@@ -3,8 +3,10 @@
 # aliases.sh -- command aliases
 #
 
-source "$HOME/.config/bash/functions.sh"
-source "$HOME/.config/bash/paths.sh"
+CURRENT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+
+source "$CURRENT_DIR/functions.sh"
+source "$CURRENT_DIR/paths.sh"
 
 # skip if loaded
 if [[ -n ${__ALIASES_SH_LOADED:-} ]]; then

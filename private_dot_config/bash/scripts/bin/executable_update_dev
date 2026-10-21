@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+#
+# update_dev - update dev environment in once
+#
+set -euo pipefail
+
+# any failure exits with 1, no matter what the failing command returned
+trap 'exit 1' ERR
+
+CURRENT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+
+# add current dir to PATH
+PATH="$CURRENT_DIR:$PATH"
+
+# ==========================================
+# CLI args
+# ==========================================
+
+show_usage() {
+  cat <<EOF
+Usage: update_dev
+
+Update the dev environment in one go: npm, bun, pi, npx skills, rust, flatpak.
+
+Exit status:
+  0  done
+  1  failure or bad usage
+
+Options:
+  -h, --help      Show this help
+EOF
+}
+
+case "${1:-}" in
+  -h | --help)
+    show_usage
+    exit 0
+    ;;
+  "") ;;
+  *)
+    echo "Error: Unknown argument '$1'. Use --help." >&2
+    exit 1
+    ;;
+esac
+
+# ==========================================
+# Precheck
+# ==========================================
+
+ensure_command() {
+  local cmd="$1"
+  if [[ ! -f $cmd || ! -x $cmd ]]; then
+    SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
+    echo "$SCRIPT_NAME: error: $cmd missing or not executable." >&2
+    exit 1
+  fi
+}
+
+# check if helper commands exist
+ensure_command "$CURRENT_DIR/command_exists"
+
+# ==========================================
+# Main Logic
+# ==========================================
+
+# --- npm & bun ---
+
+if (command_exists npm); then
+  echo ""
+  echo "[Running] npm update -g"
+  npm update -g
+  echo "----------------------------------"
+fi
+
+if (command_exists bun); then
+  echo ""
+  echo "[Running] bun update -g"
+  bun update -g
+  echo "----------------------------------"
+fi
+
+# --- pi ---
+
+if (command_exists pi); then
+  echo ""
+  echo "[Running] pi update --all"
+  pi update --all
+  echo "----------------------------------"
+fi
+
+# --- npx skills ---
+
+if (command_exists npx); then
+  echo ""
+  echo "[Running] npx skills update -g -y"
+  npx skills update -g -y
+  echo "----------------------------------"
+fi
+
+# --- rust ---
+
+# update rust toolchain
+if (command_exists rustup); then
+  echo ""
+  echo "[Running] rustup update"
+  rustup update
+  echo "----------------------------------"
+fi
+
+# update installed rust binaries using `cargo-update`
+if command_exists cargo && (cargo install --list | grep -q "cargo-update"); then
+  echo ""
+  echo "[Running] cargo install-update --all"
+  cargo install-update --all
+  echo "----------------------------------"
+fi
+
+# --- flatpak ---
+
+if command_exists flatpak; then
+  echo ""
+  echo "[Running] flatpak update"
+  flatpak update
+  echo "----------------------------------"
+fi
+
+echo ""
+echo "[FINISHED] All Updates."
