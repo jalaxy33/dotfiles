@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+#
+# Check and install missing dependencies for my niri dotfiles:
+#   https://github.com/jalaxy33/niri-dotfiles
+#
+# NOTE: Only available for archlinux!
+#
+set -euo pipefail
+
+CURRENT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+SCRIPT_BINS="$(dirname $CURRENT_DIR)/bin"
+
+# add current dir to PATH
+PATH="$CURRENT_DIR:$PATH"
+
+# ==========================================
+# CLI args
+# ==========================================
+
+# ==========================================
+# Precheck
+# ==========================================
+
+ensure_command() {
+  local cmd="$1"
+  if [[ ! -f $cmd || ! -x $cmd ]]; then
+    SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
+    echo "$SCRIPT_NAME: error: $cmd missing or not executable." >&2
+    exit 1
+  fi
+}
+
+# add "../bin/" to PATH
+if [ -d $SCRIPT_BINS ]; then
+  PATH="$SCRIPT_BINS:$PATH"
+else
+  SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
+  echo "$SCRIPT_NAME: error: $SCRIPT_BINS missing" >&2
+  exit 1
+fi
+
+# check if helper commands exist
+ensure_command "$CURRENT_DIR/is_archlinux"
+ensure_command "$CURRENT_DIR/ensure-dotfiles-depends"
+ensure_command "$SCRIPT_BINS/proxy_ok"
+
+# exit when not archlinux
+if ! is_archlinux; then
+  SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
+  echo "$SCRIPT_NAME: error: This script only support archlinux!" >&2
+  exit 1
+fi
+
+# ==========================================
+# Run before this
+# ==========================================
+
+ensure-dotfiles-depends
+
+#==================================
+# List dependencies
+#==================================
+
+# install by pacman
+pac_depends=(
+  "kitty"
+  "fish"
+  "thunar"
+  "imv"
+  "satty"
+  "wl-clipboard"
+  # GTK theme
+  "adw-gtk-theme"
+  "nwg-look"
+)
+
+# install from AUR
+aur_depends=(
+)
+
+# install from AUR with proxy needed
+aur_proxy_depends=(
+  "ttf-jetbrains-maple-mono-nf-xx-xx"
+)
+
+# ==========================================
+# Main Logic
+# ==========================================
+
+#
+# pacman depends
+#-------------------------------------
+
+echo ""
+echo "====== niri: pacman ======"
+echo ""
+
+if [[ ${#pac_depends[@]} -ne 0 ]]; then
+  echo "[Running] sudo pacman -S --needed ${pac_depends[@]}"
+  echo ""
+  sudo pacman -S --needed "${pac_depends[@]}"
+else
+  echo "No dependencies. SKIPPED."
+fi
+
+#
+# AUR depends
+#-------------------------------------
+
+echo ""
+echo "====== niri: AUR ======"
+echo ""
+
+if [[ ${#aur_depends[@]} -ne 0 ]]; then
+  echo "[Running] paru -S --needed ${aur_depends[@]}"
+  echo ""
+  paru -S --needed "${aur_depends[@]}"
+else
+  echo "No dependencies. SKIPPED."
+fi
+
+#
+# AUR depends (proxy needed)
+#-------------------------------------
+
+echo ""
+echo "====== niri: AUR (proxy needed) ======"
+echo ""
+
+if [[ ${#aur_proxy_depends[@]} -ne 0 ]]; then
+  if proxy_ok; then
+    echo "[Running] paru -S --needed ${aur_proxy_depends[@]}"
+    echo ""
+    paru -S --needed "${aur_proxy_depends[@]}"
+  else
+    echo "$SCRIPT_NAME: Warning: proxy is not working. SKIPPED."
+  fi
+else
+  echo "No dependencies. SKIPPED."
+fi
+
+echo "Done."

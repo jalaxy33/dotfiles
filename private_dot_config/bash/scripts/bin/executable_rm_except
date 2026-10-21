@@ -1,0 +1,230 @@
+#!/usr/bin/env bash
+#
+# rm_except - Delete all items in current directory except the specified names
+#
+set -euo pipefail
+
+# any failure exits with 1, no matter what the failing command returned
+trap 'exit 1' ERR
+
+# ==========================================
+# CLI args
+# ==========================================
+
+show_usage() {
+  cat <<EOF
+Usage: rm_except [-y|--yes] [--dry-run] [-D|--dir dir] [--] item1 [item2 ...]
+
+Delete everything at the top level of DIR (default: .) except the listed names.
+Missing names only warn; if none exist, everything is deleted.
+
+Exit status:
+  0  done, dry run, or cancelled
+  1  failure
+
+Options:
+  -y, --yes       delete without confirmation
+  --dry-run       list only, delete nothing
+  -D, --dir DIR   target directory (also --dir=DIR)
+  --              stop option parsing
+  -h, --help      this help
+
+Examples:
+  rm_except .git src README.md
+  rm_except -D ~/build -y keep-me
+  rm_except -- -dashed-name
+EOF
+}
+
+yes=0
+dry=0
+target_dir=""
+keep=()
+orig_args=("$@")
+
+add_keep() {
+  local name=${1#./}
+  name=${name%/}
+  [[ -n $name ]] || return 0
+  if [[ $name == */* ]]; then
+    echo "Error: '$name' contains '/', top-level names only" >&2
+    exit 1
+  fi
+  if [[ $name == "." || $name == ".." ]]; then
+    echo "Error: '$name' is not a valid name" >&2
+    exit 1
+  fi
+  keep+=("$name")
+}
+
+while (($#)); do
+  case "$1" in
+    -h | --help)
+      show_usage
+      exit 0
+      ;;
+    -y | --yes) yes=1 ;;
+    --dry-run) dry=1 ;;
+    -D | --dir)
+      (($# >= 2)) || {
+        echo "Error: $1 needs a directory" >&2
+        exit 1
+      }
+      target_dir=$2
+      shift
+      ;;
+    --dir=*)
+      target_dir=${1#--dir=}
+      [[ -n $target_dir ]] || {
+        echo "Error: --dir needs a directory" >&2
+        exit 1
+      }
+      ;;
+    --)
+      shift
+      while (($#)); do
+        add_keep "$1"
+        shift
+      done
+      break
+      ;;
+    -*)
+      echo "Error: unknown option '$1' (see --help)" >&2
+      exit 1
+      ;;
+    *) add_keep "$1" ;;
+  esac
+  shift
+done
+
+if ((${#keep[@]} == 0)); then
+  echo "Error: no keep names given (see --help)" >&2
+  exit 1
+fi
+
+# Everything below works in the target directory
+if [[ -n $target_dir ]]; then
+  cd -- "$target_dir" 2>/dev/null || {
+    echo "Error: cannot enter '$target_dir'" >&2
+    exit 1
+  }
+fi
+
+# Names that do not exist are only warned about and ignored, so a keep list can
+# contain optional entries; but if none of them exist, refuse to delete anything
+present=()
+missing=()
+for k in "${keep[@]}"; do
+  if [[ -e $k || -L $k ]]; then
+    present+=("$k")
+  else
+    missing+=("$k")
+  fi
+done
+
+keep=("${present[@]}")
+
+# ==========================================
+# Main Logic
+# ==========================================
+
+# Safety: refuse to run in dangerous directories (physical path, so symlinks do not hide it)
+# pwd -P keeps "//" as is, so squeeze repeated slashes first
+canon_path() {
+  local p=$1
+  while [[ $p == *//* ]]; do
+    p=${p//\/\//\/}
+  done
+  printf '%s' "$p"
+}
+
+curr_dir=$(canon_path "$(pwd -P)")
+home_dir=$(canon_path "$(cd "$HOME" 2>/dev/null && pwd -P || printf '%s' "$HOME")")
+if [[ $curr_dir == "/" || $curr_dir == "$home_dir" ]]; then
+  echo "Error: refusing to run in $curr_dir" >&2
+  exit 1
+fi
+
+# Build the victim list by comparing names literally, so glob characters in a
+# keep name cannot match (and delete) a different file
+targets=()
+shopt -s dotglob nullglob
+for path in ./*; do
+  name=${path#./}
+  kept=0
+  for k in "${keep[@]}"; do
+    if [[ $name == "$k" ]]; then
+      kept=1
+      break
+    fi
+  done
+  ((kept)) || targets+=("$path")
+done
+
+# ==========================================
+# Report
+# ==========================================
+
+green=""
+red=""
+yellow=""
+reset=""
+if [[ -t 1 && -z ${NO_COLOR:-} ]]; then
+  green=$'\e[32m'
+  red=$'\e[31m'
+  yellow=$'\e[33m'
+  reset=$'\e[0m'
+fi
+
+# Join a list into one line; no truncation
+join_names() {
+  local out=""
+  local name
+  for name in "$@"; do
+    out+="$name "
+  done
+  printf '%s' "${out% }"
+}
+
+cmdline=$(basename -- "${BASH_SOURCE[0]}")
+for a in "${orig_args[@]}"; do
+  printf -v q '%q' "$a"
+  cmdline+=" $q"
+done
+
+echo
+echo "[Running] $cmdline"
+echo "  target folder: $PWD"
+keep_color=$green
+((${#keep[@]})) || keep_color=$yellow
+printf '  keep:   %s%s%s\n' "$keep_color" "$(join_names "${keep[@]}")" "$reset"
+printf '  remove: %s%s%s\n' "$red" "$(join_names "${targets[@]#./}")" "$reset"
+if ((${#missing[@]})); then
+  printf '  skip missing: %s%s%s\n' "$yellow" "$(join_names "${missing[@]}")" "$reset"
+fi
+
+n=${#targets[@]}
+
+if ((dry)); then
+  echo
+  echo "Dry run, nothing deleted."
+  exit 0
+fi
+
+if ((yes)); then
+  :
+elif [[ -t 0 ]]; then
+  read -rp "Delete $n item(s)? (y/N): " confirm
+  [[ $confirm =~ ^[Yy]$ ]] || {
+    echo "Cancelled."
+    exit 0
+  }
+else
+  echo "Error: no terminal, use -y" >&2
+  exit 1
+fi
+
+if ((${#targets[@]})); then
+  printf '%s\0' "${targets[@]}" | xargs -0 rm -rf --
+fi
+echo "Deleted $n item(s)."

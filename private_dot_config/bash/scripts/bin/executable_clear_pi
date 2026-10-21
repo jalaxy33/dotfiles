@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+#
+# clear_pi - clear caches in ~/.pi
+#
+set -euo pipefail
+
+CURRENT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+PI_HOME="$HOME/.pi-bak"
+
+# add current dir to PATH
+PATH="$CURRENT_DIR:$PATH"
+
+# ==========================================
+# CLI args
+# ==========================================
+
+show_usage() {
+  cat <<EOF
+Usage: clear_pi
+
+Remove the caches in $PI_HOME.
+
+Exit status:
+  0  done
+  1  failure or bad usage
+
+Options:
+  -h, --help      Show this help
+EOF
+}
+
+case "${1:-}" in
+  -h | --help)
+    show_usage
+    exit 0
+    ;;
+  "") ;;
+  *)
+    SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
+    echo "$SCRIPT_NAME: error: unknown argument '$1'. Use --help." >&2
+    exit 1
+    ;;
+esac
+
+# ==========================================
+# Precheck
+# ==========================================
+
+ensure_command() {
+  local cmd="$1"
+  if [[ ! -f $cmd || ! -x $cmd ]]; then
+    SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
+    echo "$SCRIPT_NAME: error: $cmd missing or not executable." >&2
+    exit 1
+  fi
+}
+
+# skip if ~/.pi not exists
+if [[ ! -d $PI_HOME ]]; then
+  SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
+  echo "$SCRIPT_NAME: $PI_HOME not found! Skipped." >&2
+  exit 1
+fi
+
+# check if helper commands exists
+ensure_command "$CURRENT_DIR/rm_except"
+
+# ==========================================
+# Main logic
+# ==========================================
+
+#
+# Step 1 - clean ~/.pi
+#--------------------------
+
+pi_keeps=(
+  # folders
+  "agent/"
+  ".git/"
+  # files
+  ".gitignore"
+  "README.md"
+  "LICENSE"
+  # extension-related
+  "web-search.json"
+)
+
+rm_except -D $PI_HOME "${pi_keeps[@]}" -y
+
+#
+# Step 2 - clean ~/.pi/agent/
+#--------------------------
+
+pi_agent_dir="$PI_HOME/agent"
+pi_agent_keeps=(
+  # folders
+  "npm/"
+  "git/"
+  "extensions/"
+  "local-packages/"
+  # files
+  ".gitignore"
+  "auth.json"
+  "settings.json"
+  "models.json"
+  "models.private.json"
+  "keybindings.json"
+  "models-store.json"
+  "mcp.json"
+  "APPEND_SYSTEM.md"
+  "AGENTS.md"
+  # extension-related
+  "subagents.json"
+  "multimodal-proxy.json"
+  ".env"
+)
+
+rm_except -D $pi_agent_dir "${pi_agent_keeps[@]}" -y

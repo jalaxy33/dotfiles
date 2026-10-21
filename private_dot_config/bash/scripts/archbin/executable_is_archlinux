@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+#
+# is_archlinux - check if on archlinux or arch-based distro
+#
+set -euo pipefail
+
+# ==========================================
+# CLI args
+# ==========================================
+
+usage() {
+  cat <<'EOF'
+Usage: is_archlinux [OPTION]
+
+Check if this system is Arch Linux or an Arch-based distro.
+
+Options:
+  -h, --help  show this help and exit
+
+Exit status:
+  0  on Arch Linux or an Arch-based distro
+  1  otherwise
+
+Example:
+  is_archlinux && echo "on archlinux"
+EOF
+}
+
+for arg in "$@"; do
+  case $arg in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "is_archlinux: unknown option: $arg" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+# ==========================================
+# Main logic
+# ==========================================
+
+[[ -r /etc/os-release ]] || exit 1
+
+. /etc/os-release 2>/dev/null
+
+[[ ${ID:-} == arch || ${ID_LIKE:-} == *arch* ]]
