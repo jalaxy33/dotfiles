@@ -1,0 +1,9 @@
+#:schema https://docs.jj-vcs.dev/latest/config-schema.json
+[revset-aliases]
+HEAD = "@"
+
+[template-aliases]
+"format_short_signature(signature)" = "signature.name()"
+
+[ui]
+default-command = "log"
