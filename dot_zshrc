@@ -21,14 +21,14 @@
 BASH_CONFIGS="$HOME/.config/bash"
 ZSH_CONFIGS="$HOME/.config/zsh"
 
-# Load configs in `$BASH_CONFIGS/`
+# Load configs in "$BASH_CONFIGS/"
 source "$BASH_CONFIGS/functions.sh"
 source "$BASH_CONFIGS/env.sh"
 source "$BASH_CONFIGS/aliases.sh"
 source "$BASH_CONFIGS/paths.sh"
 source "$BASH_CONFIGS/languages.sh"
 
-# Load configs in $ZSH_CONFIGS/`
+# Load configs in "$ZSH_CONFIGS/"
 source "$ZSH_CONFIGS/zsh_functions.zsh"
 source "$ZSH_CONFIGS/zsh_keybinds.zsh"
 source "$ZSH_CONFIGS/zsh_aliases.zsh"
@@ -38,8 +38,7 @@ source "$ZSH_CONFIGS/zsh_aliases.zsh"
 #==========================================
 
 # try to activate homebrew (if installed)
-BREW_CMD="/home/linuxbrew/.linuxbrew/bin/brew"
-[[ -f $BREW_CMD ]] && eval "$($BREW_CMD shellenv)"
+command_exists brew && eval "$(brew shellenv)"
 
 # uncomment to use zimfw
 activate_zimfw

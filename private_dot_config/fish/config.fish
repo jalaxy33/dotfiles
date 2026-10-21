@@ -20,11 +20,8 @@ if status is-interactive
     set fish_greeting ""
 end
 
-
 # try to activate homebrew (if installed)
-set BREW_CMD "/home/linuxbrew/.linuxbrew/bin/brew"
-command -q $BREW_CMD && eval ($BREW_CMD shellenv)
-
+command -q brew && eval (brew shellenv)
 
 # init apps
 command -q starship && starship init fish | source

@@ -4,9 +4,7 @@
 #
 
 # skip if loaded
-if [[ -n ${__FUNCTIONS_SH_LOADED:-} ]]; then
-  return 0
-fi
+[[ -n ${__FUNCTIONS_SH_LOADED:-} ]] && return 0
 readonly __FUNCTIONS_SH_LOADED=1
 
 # ==========================================
