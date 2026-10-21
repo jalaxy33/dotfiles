@@ -3,7 +3,12 @@
 # aliases.sh -- command aliases
 #
 
-CURRENT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+case ${ZSH_VERSION-} in
+  '') _src=${BASH_SOURCE:-$0} ;;   # bash
+  *)  _src=${(%):-%x} ;;           # zsh
+esac
+CURRENT_DIR=$(cd -- "$(dirname -- "$_src")" && pwd -P)
+unset _src
 
 source "$CURRENT_DIR/functions.sh"
 source "$CURRENT_DIR/paths.sh"
