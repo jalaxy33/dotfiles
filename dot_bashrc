@@ -18,11 +18,14 @@
 # Imports
 #==========================================
 
-# Load configs in `~/.bash/`
-source "$HOME/.config/bash/functions.sh"
-source "$HOME/.config/bash/env.sh"
-source "$HOME/.config/bash/aliases.sh"
-source "$HOME/.config/bash/paths.sh"
+BASH_CONFIGS="$HOME/.config/bash"
+
+# Load configs in `$BASH_CONFIGS/`
+source "$BASH_CONFIGS/functions.sh"
+source "$BASH_CONFIGS/env.sh"
+source "$BASH_CONFIGS/aliases.sh"
+source "$BASH_CONFIGS/paths.sh"
+source "$BASH_CONFIGS/languages.sh"
 
 #==========================================
 # Init Apps
@@ -43,8 +46,8 @@ command_exists jj && source <(jj util completion bash)
 #==========================================
 
 # load bash specific configs
-source "$HOME/.config/bash/bash-specific/shell-configs.sh"
-source "$HOME/.config/bash/bash-specific/bash-funcs.sh"
+source "$BASH_CONFIGS/bash-specific/shell-configs.sh"
+source "$BASH_CONFIGS/bash-specific/bash-apps.sh"
 
 #
 # -- bash specific apps --
