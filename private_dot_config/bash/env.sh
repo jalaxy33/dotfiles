@@ -60,8 +60,10 @@ export GOPROXY="https://mirrors.tencent.com/go/"
 # os-specific
 #======================================
 
+ARCHBINS="$CURRENT_DIR/scripts/archbin"
+
 # libtorch
-if is_archlinux && [ -d /opt/libtorch ]; then
+if $ARCHBINS/is_archlinux && [ -d /opt/libtorch ]; then
   export LIBTORCH="/opt/libtorch"
   export LD_LIBRARY_PATH="$LIBTORCH/lib":$LD_LIBRARY_PATH
   export LIBTORCH_BYPASS_VERSION_CHECK="1"
