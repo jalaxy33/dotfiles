@@ -1,2 +1,4 @@
 .zsh
 .bash
+.local/bin/scripts
+.local/bin/archbin

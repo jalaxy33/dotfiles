@@ -3,6 +3,8 @@
 # Setting environment variables for fish
 #
 
+set BASH_SCRIPTS "$HOME/.config/bash/scripts"
+
 #======================================
 # apps
 #======================================
@@ -48,8 +50,10 @@ test -e ~/.env && load_dotenv
 # os-specific
 #======================================
 
+set ARCHBINS "$BASH_SCRIPTS/archbin"
+
 # libtorch
-if is_archlinux; and test -d /opt/libtorch
+if $ARCHBINS/is_archlinux; and test -d /opt/libtorch
     set -x LIBTORCH "/opt/libtorch"
     set -x LD_LIBRARY_PATH "$LIBTORCH/lib":$LD_LIBRARY_PATH
     set -x LIBTORCH_BYPASS_VERSION_CHECK "1"
