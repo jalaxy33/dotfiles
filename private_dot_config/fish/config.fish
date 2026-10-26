@@ -28,4 +28,3 @@ command -q starship && starship init fish | source
 command -q zoxide && zoxide init fish --cmd cd | source
 command -q fzf && fzf --fish | source
 command -q jj && jj util completion fish | source
-

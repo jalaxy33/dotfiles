@@ -1,0 +1,7 @@
+patch:
+  # install by: 
+  # $ sudo pacman -S rime-wanxiang-gram-zh-hans
+  #
+  # or download from:
+  #     https://github.com/amzxyz/RIME-LMDG/releases/download/LTS/wanxiang-lts-zh-hans.gram
+  "grammar/language": wanxiang-lts-zh-hans
