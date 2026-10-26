@@ -41,16 +41,9 @@ set clipboard=unnamedplus
 " 接管鼠标事件
 set mouse=a
 
-" 保存 fcitx5 的状态
-let g:fcitx5state = 1
-" 当进入普通模式时：记录当前状态，并关闭输入法
-autocmd InsertLeave * let g:fcitx5state = str2nr(system("fcitx5-remote")[0]) | silent call system("fcitx5-remote -c")
+" fcitx5状态切换与恢复
+let g:fcitx_state = 1
+autocmd InsertLeave * let g:fcitx_state = system("fcitx5-remote")[0] | call job_start("fcitx5-remote -c")
+autocmd InsertEnter * if g:fcitx_state == '2' | call job_start("fcitx5-remote -o") | endif
+autocmd VimEnter * call job_start("fcitx5-remote -c")
 
-" 远程剪贴板同步
-function! s:osc52(text)
-  let b = substitute(system('base64', a:text), '\n', '', '')
-  silent! call writefile(["\e]52;c;".b."\a"], '/dev/fd/2', 'a')
-endfunction
-" yank 后自动同步(含系统寄存器 + 和 y 默认寄存器)
-autocmd TextYankPost * if v:event.operator ==# 'y'
-      \| call s:osc52(join(v:event.regcontents, "\n")) | endif
