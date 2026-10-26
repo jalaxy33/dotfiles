@@ -47,3 +47,12 @@ autocmd InsertLeave * let g:fcitx_state = system("fcitx5-remote")[0] | call job_
 autocmd InsertEnter * if g:fcitx_state == '2' | call job_start("fcitx5-remote -o") | endif
 autocmd VimEnter * call job_start("fcitx5-remote -c")
 
+
+" 远程剪贴板同步
+function! s:osc52(text)
+  let b = substitute(system('base64', a:text), '\n', '', '')
+  silent! call writefile(["\e]52;c;".b."\a"], '/dev/fd/2', 'a')
+endfunction
+" yank 后自动同步(含系统寄存器 + 和 y 默认寄存器)
+autocmd TextYankPost * if v:event.operator ==# 'y'
+      \| call s:osc52(join(v:event.regcontents, "\n")) | endif
