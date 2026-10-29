@@ -98,6 +98,7 @@ pi_agent_keeps=(
   "git/"
   "extensions/"
   "local-packages/"
+  "bin/"
   # files
   ".gitignore"
   "auth.json"
