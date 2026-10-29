@@ -111,6 +111,13 @@ pac_depends=(
   "npm"
   "jujutsu"
   "lazyjj"
+  # yazi additional
+  "yazi"
+  "7zip"
+  "ffmpeg"
+  "poppler"
+  "resvg"
+  "imagemagick"
   # rust depends
   "mold"
   "clang"
