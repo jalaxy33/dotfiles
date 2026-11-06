@@ -141,6 +141,17 @@
 
   // -- 编程语言设置 --
   "languages": {
+    "CSS": {
+      "tab_size": 3,
+      "language_servers": [
+        "tailwindcss-intellisense-css",
+        "!vscode-css-language-server",
+      ],
+    },
+    "HTML": {
+      "tab_size": 2,
+      "formatter": "language_server",
+    },
     "Markdown-Inline": {
       "tab_size": 2,
     },
@@ -150,7 +161,6 @@
     "Lua": {
       "tab_size": 2,
     },
-
     "Shell Script": {
       "tab_size": 2,
     },
@@ -176,6 +186,26 @@
         // Use `-p` instead of `--workspace` for cargo check
         "check": {
           "workspace": false,
+        },
+      },
+    },
+    "tailwindcss-language-server": {
+      "settings": {
+        "classFunctions": ["cva", "cx"],
+        "experimental": {
+          "classRegex": [
+            "class=\"([^\"]*)\"",
+            "[cls|className]\\s\\:\\=\\s\"([^\"]*)",
+            "\\.className\\s*[+]?=\\s*['\"]([^'\"]*)['\"]",
+            "\\.setAttributeNS\\(.*,\\s*['\"]class['\"],\\s*['\"]([^'\"]*)['\"]",
+            "\\.setAttribute\\(['\"]class['\"],\\s*['\"]([^'\"]*)['\"]",
+            "\\.classList\\.add\\(['\"]([^'\"]*)['\"]",
+            "\\.classList\\.remove\\(['\"]([^'\"]*)['\"]",
+            "\\.classList\\.toggle\\(['\"]([^'\"]*)['\"]",
+            "\\.classList\\.contains\\(['\"]([^'\"]*)['\"]",
+            "\\.classList\\.replace\\(\\s*['\"]([^'\"]*)['\"]",
+            "\\.classList\\.replace\\([^,)]+,\\s*['\"]([^'\"]*)['\"]",
+          ],
         },
       },
     },
