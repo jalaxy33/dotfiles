@@ -32,15 +32,15 @@ EOF
 }
 
 case "${1:-}" in
-  -h | --help)
-    show_usage
-    exit 0
-    ;;
-  "") ;;
-  *)
-    echo "Error: Unknown argument '$1'. Use --help." >&2
-    exit 1
-    ;;
+-h | --help)
+  show_usage
+  exit 0
+  ;;
+"") ;;
+*)
+  echo "Error: Unknown argument '$1'. Use --help." >&2
+  exit 1
+  ;;
 esac
 
 # ==========================================
@@ -76,6 +76,13 @@ if (command_exists bun); then
   echo ""
   echo "[Running] bun update -g"
   bun update -g
+  echo "----------------------------------"
+fi
+
+if (command_exists pnpm); then
+  echo ""
+  echo "[Running] pnpm self-update && pnpm update -g"
+  pnpm self-update && pnpm update -g
   echo "----------------------------------"
 fi
 
