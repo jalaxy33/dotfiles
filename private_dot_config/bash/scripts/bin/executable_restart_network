@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+#
+# restart_network - restart the wifi backend and NetworkManager
+#
+set -euo pipefail
+
+# any failure exits with 1, no matter what the failing command returned
+trap 'exit 1' ERR
+
+# ==========================================
+# CLI args
+# ==========================================
+
+show_usage() {
+  cat <<EOF
+Usage: restart_network
+
+Restart the network stack:
+  1. If wifi is in use, restart its backend (iwd or wpa_supplicant)
+  2. Restart NetworkManager
+
+Commands are run with sudo unless already root.
+
+Exit status:
+  0  done
+  1  failure or bad usage
+
+Options:
+  -h, --help      Show this help
+EOF
+}
+
+case "${1:-}" in
+  -h | --help)
+    show_usage
+    exit 0
+    ;;
+  "") ;;
+  *)
+    echo "Error: Unknown argument '$1'. Use --help." >&2
+    exit 1
+    ;;
+esac
+
+# ==========================================
+# Helpers
+# ==========================================
+
+has() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+as_root() {
+  if [[ $EUID -eq 0 ]]; then
+    "$@"
+  elif has sudo; then
+    sudo "$@"
+  else
+    echo "Error: root privileges needed to run: $*" >&2
+    return 1
+  fi
+}
+
+# active_wifi_iface - print the wifi interface that is connected, if any
+active_wifi_iface() {
+  local iface="" dir name
+
+  if has nmcli; then
+    # terse output keeps state strings untranslated: "connected", "connected (local only)"
+    iface=$(nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null |
+      awk -F: '$2 == "wifi" && $3 ~ /^connected/ {print $1; exit}') || iface=""
+    [[ -n $iface ]] && {
+      echo "$iface"
+      return 0
+    }
+  fi
+
+  # no NetworkManager: look at sysfs, then confirm the link is up
+  for dir in /sys/class/net/*; do
+    [[ -d $dir/wireless ]] || continue
+    [[ $(<"$dir/operstate") == up ]] || continue
+    name=$(basename -- "$dir")
+    if has iw; then
+      iw dev "$name" link 2>/dev/null | grep -q '^Connected' || continue
+    fi
+    echo "$name"
+    return 0
+  done
+}
+
+# wifi_backend - print "iwd" or "wpa_supplicant"
+wifi_backend() {
+  local backend=""
+
+  if has NetworkManager; then
+    # only WiFi-related lines, so unrelated "=" values cannot match
+    backend=$(NetworkManager --print-config 2>/dev/null |
+      awk -F= '/^[[:space:]]*wifi\.backend[[:space:]]*=/ {gsub(/[[:space:]]/, "", $2); print $2}' |
+      tail -n1) || backend=""
+  fi
+
+  if [[ -z $backend ]]; then
+    backend=$(grep -rhs -E '^[[:space:]]*wifi\.backend[[:space:]]*=' \
+      /etc/NetworkManager/NetworkManager.conf \
+      /etc/NetworkManager/conf.d /usr/lib/NetworkManager/conf.d 2>/dev/null |
+      tail -n1 | cut -d= -f2 | tr -d '[:space:]') || backend=""
+  fi
+
+  if [[ $backend == iwd ]]; then
+    echo "iwd"
+  else
+    echo "wpa_supplicant"
+  fi
+}
+
+restart_wifi_backend() {
+  local iface="$1" backend="$2" unit=""
+
+  if [[ $backend == iwd ]]; then
+    echo "[Running] systemctl restart iwd"
+    as_root systemctl restart iwd
+    return
+  fi
+
+  # wpa_supplicant may run as a template unit per interface
+  for candidate in "wpa_supplicant@$iface.service" wpa_supplicant.service; do
+    if systemctl is-active --quiet "$candidate" 2>/dev/null; then
+      unit="$candidate"
+      break
+    fi
+  done
+  unit="${unit:-wpa_supplicant.service}"
+
+  echo "[Running] systemctl restart $unit"
+  as_root systemctl restart "$unit"
+}
+
+# ==========================================
+# Main logic
+# ==========================================
+
+iface=$(active_wifi_iface) || iface=""
+
+if [[ -n $iface ]]; then
+  backend=$(wifi_backend)
+  echo "[INFO] wifi in use: $iface (backend: $backend)"
+  restart_wifi_backend "$iface" "$backend"
+else
+  echo "[INFO] wifi not in use, skipping wifi backend restart"
+fi
+
+echo "[Running] systemctl restart NetworkManager"
+as_root systemctl restart NetworkManager
+
+echo "[FINISHED] Network restarted."

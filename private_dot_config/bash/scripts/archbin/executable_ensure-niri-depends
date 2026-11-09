@@ -17,6 +17,34 @@ PATH="$CURRENT_DIR:$PATH"
 # CLI args
 # ==========================================
 
+usage() {
+  cat <<'EOF'
+Usage: ensure-niri-depends [OPTION]
+
+Check and install missing dependencies for my niri dotfiles:
+  https://github.com/jalaxy33/niri-dotfiles
+
+NOTE: Only available on Arch Linux.
+
+Options:
+  -h, --help  show this help and exit
+EOF
+}
+
+for arg in "$@"; do
+  case $arg in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "ensure-niri-depends: unknown option: $arg" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
 # ==========================================
 # Precheck
 # ==========================================
