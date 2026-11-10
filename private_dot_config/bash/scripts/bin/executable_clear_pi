@@ -97,8 +97,8 @@ pi_agent_keeps=(
   "npm/"
   "git/"
   "extensions/"
-  "local-packages/"
   "bin/"
+  "skills/"
   # files
   ".gitignore"
   "auth.json"

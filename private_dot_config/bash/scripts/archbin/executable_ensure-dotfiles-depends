@@ -109,6 +109,7 @@ pac_depends=(
   "bash-completion"
   "nodejs"
   "npm"
+  "bun"
   "jujutsu"
   "lazyjj"
   # yazi additional
