@@ -50,8 +50,7 @@ disabled = true
 
 
 [shell]
-# fish_indicator = '❯'
-fish_indicator = '>'
+fish_indicator = '➜'
 bash_indicator = '\$'
 zsh_indicator = '%'
 style = 'green bold'
