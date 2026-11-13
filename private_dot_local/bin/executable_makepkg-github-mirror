@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+#
+# Download wrapper for makepkg: rewrites GitHub URLs to a mirror, then fetches.
+# Usage (makepkg DLAGENTS): "https::$HOME/.local/bin/makepkg-github-mirror %o %u"
+# Integrity still comes from the PKGBUILD sha256, so a bad mirror is caught.
+#
+
+# ghfast.top can be swapped for gh-proxy.com or ghproxy.net if it dies.
+mirror="https://ghfast.top/"
+
+# $1 = output file (%o), $2 = URL (%u)
+out=$1; url=$2
+
+case "$url" in
+  https://github.com/*|https://*.githubusercontent.com/*) url="$mirror$url" ;;
+esac
+
+# -C - resumes a partial .part file; keep single connection, mirrors often
+# do not support ranges.
+exec curl -qgb "" -fLC - --retry 3 --retry-delay 3 -o "$out" "$url"

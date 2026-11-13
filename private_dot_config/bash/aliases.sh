@@ -47,9 +47,6 @@ alias nv="nvim"
 alias fa="fastfetch"
 alias grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
 
-command_exists lazygit && alias lg="lazygit"
-command_exists lazyjj && alias lj="lazyjj"
-
 # reboot/poweroff
 alias reboot="sudo systemctl reboot"
 alias poweroff="sudo systemctl poweroff"
@@ -106,9 +103,8 @@ if command_exists chezmoi; then
   alias nirichezmoi="chezmoi -S $HOME/.local/share/chezmoi-niri/"
 fi
 
-# lazygit
-
-# lazyjj
+# lazygit & lazyjj
+command_exists lazygit && alias lg="lazygit"
 command_exists lazyjj && alias lj="lazyjj"
 
 # ==========================================
@@ -127,3 +123,6 @@ y() {
   [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
   rm -f -- "$tmp"
 }
+
+
+

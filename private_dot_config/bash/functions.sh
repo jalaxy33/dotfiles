@@ -25,7 +25,6 @@ prepend_path() {
   return 0
 }
 
-
 # Source FILE(s) if they exist and are readable.
 # Usage: try_source FILE [FILE...]
 # Example: try_source "$HOME/.bashrc.local"
