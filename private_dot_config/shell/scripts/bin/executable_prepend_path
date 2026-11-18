@@ -19,7 +19,7 @@ case $0 in
   */*) __dir=${0%/*} ;;
   *) __dir=. ;;
 esac
-. "$__dir/../_lib.sh"
+. "$__dir/../lib/posix.sh"
 
 shell_target=posix
 

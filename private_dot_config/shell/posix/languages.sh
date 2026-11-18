@@ -20,7 +20,7 @@ PNPM_HOME="$HOME/.local/share/pnpm"
 BUN_BIN_DIR="$HOME/.bun/bin"
 [[ -d $BUN_BIN_DIR ]] && export BUN_BIN_DIR
 
-# First entry wins; missing directories are skipped.
+# add PATHS for tools 
 __paths=(
   # cabal first: ghcup may ship its own copy
   "$HOME/.cabal/bin"
@@ -39,3 +39,9 @@ __paths=(
 )
 
 eval "$(prepend_path "${__paths[@]}")"
+
+# ==========================================
+# clean
+# ==========================================
+
+unset __paths

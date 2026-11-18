@@ -12,8 +12,8 @@ if test -d "$HOME/.bun/bin"
     set -gx BUN_BIN_DIR "$HOME/.bun/bin"
 end
 
-# First entry wins; missing directories are skipped.
-set -g __paths \
+# add PATHS for tools
+set -l __paths \
     # cabal first: ghcup may ship its own copy
     $HOME/.cabal/bin \
     # ghcup

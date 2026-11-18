@@ -4,6 +4,8 @@
 #
 set -euo pipefail
 
+. "$(dirname -- "${BASH_SOURCE[0]}")/../lib/bash.sh"
+
 CURRENT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 PI_HOME="$HOME/.pi"
 
@@ -36,7 +38,6 @@ case "${1:-}" in
     ;;
   "") ;;
   *)
-    SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
     echo "$SCRIPT_NAME: error: unknown argument '$1'. Use --help." >&2
     exit 1
     ;;
@@ -46,17 +47,7 @@ esac
 # Precheck
 # ==========================================
 
-ensure_command() {
-  local cmd="$1"
-  if [[ ! -f $cmd || ! -x $cmd ]]; then
-    SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
-    echo "$SCRIPT_NAME: error: $cmd missing or not executable." >&2
-    exit 1
-  fi
-}
-
 if [[ ! -d $PI_HOME ]]; then
-  SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
   echo "$SCRIPT_NAME: $PI_HOME not found! Skipped." >&2
   exit 1
 fi

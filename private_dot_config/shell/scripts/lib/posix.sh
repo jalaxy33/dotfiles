@@ -1,11 +1,10 @@
 #!/bin/sh
 #
-# _lib.sh -- quoting helpers shared by the commands in bin/.
-# Sourced, never executed.
+# lib/posix.sh -- quoting helpers for the sh scripts. Sourced, never executed.
 #
 # Usage:
 #   case $0 in */*) __dir=${0%/*} ;; *) __dir=. ;; esac
-#   . "$__dir/../_lib.sh"
+#   . "$__dir/../lib/posix.sh"
 #
 #   shell_target=posix          # or fish, see set_shell_target
 #   emit_set KEY VALUE

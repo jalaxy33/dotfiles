@@ -38,27 +38,16 @@ alias grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
 alias reboot="sudo systemctl reboot"
 alias poweroff="sudo systemctl poweroff"
 
-# configs shortcuts
-BASH_CONFIG="$HOME/.bashrc"
-alias vibash="vi $BASH_CONFIG"
-alias nvbash="nv $BASH_CONFIG"
-alias hxbash="hx $BASH_CONFIG"
-alias catbash="cat $BASH_CONFIG"
-alias batbash="bat $BASH_CONFIG"
+# vibash/nvbash/hxbash/catbash/batbash open the config of NAME
+_alias_config() {
+  local __name=$1 __file=$2
+  alias "vi$__name=vi $__file" "nv$__name=nv $__file" "hx$__name=hx $__file" \
+    "cat$__name=cat $__file" "bat$__name=bat $__file"
+}
 
-ZSH_CONFIG="$HOME/.zshrc"
-alias vizsh="vi $ZSH_CONFIG"
-alias nvzsh="nv $ZSH_CONFIG"
-alias hxzsh="hx $ZSH_CONFIG"
-alias catzsh="cat $ZSH_CONFIG"
-alias batzsh="bat $ZSH_CONFIG"
-
-FISH_CONFIG="$HOME/.config/fish/config.fish"
-alias vifish="vi $FISH_CONFIG"
-alias nvfish="nv $FISH_CONFIG"
-alias hxfish="hx $FISH_CONFIG"
-alias catfish="cat $FISH_CONFIG"
-alias batfish="bat $FISH_CONFIG"
+_alias_config bash "$HOME/.bashrc"
+_alias_config zsh "$HOME/.zshrc"
+_alias_config fish "$HOME/.config/fish/config.fish"
 
 # ==========================================
 # command aliases
@@ -108,9 +97,15 @@ ls() {
 
 y() {
   command -v yazi >/dev/null 2>&1 || return 1
-  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-  command yazi "$@" --cwd-file="$tmp"
-  IFS= read -r -d '' cwd <"$tmp"
-  [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
-  rm -f -- "$tmp"
+  local __tmp="$(mktemp -t "yazi-cwd.XXXXXX")" __cwd
+  command yazi "$@" --cwd-file="$__tmp"
+  IFS= read -r -d '' __cwd <"$__tmp"
+  [ "$__cwd" != "$PWD" ] && [ -d "$__cwd" ] && builtin cd -- "$__cwd"
+  rm -f -- "$__tmp"
 }
+
+# ==========================================
+# clean
+# ==========================================
+
+unset -f _alias_config

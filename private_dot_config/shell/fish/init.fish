@@ -1,16 +1,19 @@
 # init.fish -- fish initialization
 
-set -g __CONFIG_DIR "$HOME/.config/shell"
-
 if status is-interactive
     set fish_greeting ""
 end
 
-# shared configs: paths first, it sets up PATH for the rest
-source $__CONFIG_DIR/fish/paths.fish
-source $__CONFIG_DIR/fish/env.fish
-source $__CONFIG_DIR/fish/languages.fish
-source $__CONFIG_DIR/fish/aliases.fish
+#======================================
+# fish settings
+#======================================
+
+set -l __SHELL_DIR $HOME/.config/shell
+
+source $__SHELL_DIR/fish/paths.fish
+source $__SHELL_DIR/fish/env.fish
+source $__SHELL_DIR/fish/languages.fish
+source $__SHELL_DIR/fish/aliases.fish
 
 #======================================
 # apps

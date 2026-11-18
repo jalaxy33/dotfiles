@@ -4,10 +4,7 @@
 #
 set -euo pipefail
 
-CURRENT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
-
-# add current dir to PATH
-PATH="$CURRENT_DIR:$PATH"
+. "$(dirname -- "${BASH_SOURCE[0]}")/_deps.sh"
 
 # ==========================================
 # CLI args
@@ -25,41 +22,7 @@ Options:
 EOF
 }
 
-for arg in "$@"; do
-  case $arg in
-    -h | --help)
-      usage
-      exit 0
-      ;;
-    *)
-      echo "ensure-archlinuxcn: unknown option: $arg" >&2
-      usage >&2
-      exit 2
-      ;;
-  esac
-done
-
-# ==========================================
-# Precheck
-# ==========================================
-
-ensure_command() {
-  local cmd="$1"
-  if [[ ! -f $cmd || ! -x $cmd ]]; then
-    SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
-    echo "$SCRIPT_NAME: error: $cmd missing or not executable." >&2
-    exit 1
-  fi
-}
-
-ensure_command "$CURRENT_DIR/is_archlinux"
-
-# exit when not archlinux
-if ! is_archlinux; then
-  SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
-  echo "$SCRIPT_NAME: error: This script only support archlinux!" >&2
-  exit 1
-fi
+deps_init "$@"
 
 # ==========================================
 # Main Logic

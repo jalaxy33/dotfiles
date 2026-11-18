@@ -1,43 +1,54 @@
-# zimfw.zsh -- zimfw setup: which script to use, activation, loaded check
+#!/usr/bin/env zsh
+#
+# zimfw.zsh -- zimfw setup: which script to use, activation
+#
+# Exit status: 0 when zimfw got loaded, 1 when it is not installed.
 
-get_zimfw() {
-  # decide which zimfw to use: system-wise or homebrew
-  # default: homebrew zimfw
-  SYSTEM_ZIMFW_ZSH="/usr/share/zimfw/zimfw.zsh"
-  BREW_ZIMFW_ZSH="/home/linuxbrew/.linuxbrew/opt/zimfw/share/zimfw.zsh"
-
-  local ZIMFW_SCRIPT=""
-  if [[ -f $BREW_ZIMFW_ZSH ]]; then
-    ZIMFW_SCRIPT=$BREW_ZIMFW_ZSH
-  elif [[ -f $SYSTEM_ZIMFW_ZSH ]]; then
-    ZIMFW_SCRIPT=$SYSTEM_ZIMFW_ZSH
-  fi
-
-  echo $ZIMFW_SCRIPT
-}
+#======================================
+# functions
+#======================================
 
 activate_zimfw() {
-  ZIMFW_SCRIPT=$(get_zimfw)
+  local __script="" __candidate __zim_home __zimrc
+  __zim_home=${ZDOTDIR:-${HOME}}/.zim
+  __zimrc=${ZIM_CONFIG_FILE:-${ZDOTDIR:-${HOME}}/.zimrc}
 
-  # activate
-  if [[ -f $ZIMFW_SCRIPT ]]; then
-    [[ ! -f $HOME/.zimrc ]] && echo "Warning: $HOME/.zimrc not exist!"
-
-    ZIM_HOME=${ZDOTDIR:-${HOME}}/.zim
-    # Install missing modules and update ${ZIM_HOME}/init.zsh if missing or outdated.
-    if [[ ! ${ZIM_HOME}/init.zsh -nt ${ZIM_CONFIG_FILE:-${ZDOTDIR:-${HOME}}/.zimrc} ]]; then
-      source $ZIMFW_SCRIPT init
+  # homebrew zimfw first, then the system one
+  for __candidate in \
+    "/home/linuxbrew/.linuxbrew/opt/zimfw/share/zimfw.zsh" \
+    "/usr/share/zimfw/zimfw.zsh"; do
+    if [[ -f $__candidate ]]; then
+      __script=$__candidate
+      break
     fi
+  done
+  [[ -n $__script ]] || return
 
-    # Initialize modules.
-    source ${ZIM_HOME}/init.zsh
+  [[ -f $__zimrc ]] || echo "Warning: $__zimrc not exist!"
 
-    # Modules configuration
-    ZSH_AUTOSUGGEST_MANUAL_REBIND=1
-
+  # install missing modules and update ${zim_home}/init.zsh when outdated
+  if [[ ! ${__zim_home}/init.zsh -nt $__zimrc ]]; then
+    source "$__script" init
   fi
+
+  # initialize modules
+  source "${__zim_home}/init.zsh"
+
+  # modules configuration
+  ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 }
 
-is_zimfw_loaded() {
-  whence -w zimfw &>/dev/null
-}
+#======================================
+# activation
+#======================================
+
+activate_zimfw
+
+#======================================
+# clean
+#======================================
+
+unset -f activate_zimfw
+
+# 0 when zimfw is loaded, so init.zsh can fall back to starship
+whence -w zimfw &>/dev/null

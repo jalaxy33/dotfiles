@@ -6,11 +6,16 @@
 # nothing to do in non-interactive shells
 [[ $- != *i* ]] && return
 
-# shared configs: paths first, it sets up PATH for the rest
-source "$HOME/.config/shell/posix/paths.sh"
-source "$HOME/.config/shell/posix/env.sh"
-source "$HOME/.config/shell/posix/languages.sh"
-source "$HOME/.config/shell/posix/aliases.sh"
+#======================================
+# shared configs
+#======================================
+
+__SHELL_DIR="$HOME/.config/shell"
+
+source "$__SHELL_DIR/posix/paths.sh"
+source "$__SHELL_DIR/posix/env.sh"
+source "$__SHELL_DIR/posix/languages.sh"
+source "$__SHELL_DIR/posix/aliases.sh"
 
 #======================================
 # bash settings
@@ -28,8 +33,8 @@ shopt -s checkwinsize
 # history: ignore duplicates and lines starting with a space, append, timestamp
 HISTCONTROL=ignoredups:ignorespace
 shopt -s histappend
-HISTSIZE=50
-HISTFILESIZE=100
+HISTSIZE=10000
+HISTFILESIZE=20000
 HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S  "
 
 #======================================
@@ -43,13 +48,13 @@ command -v fzf >/dev/null && eval "$(fzf --bash)"
 command -v jj >/dev/null && source <(jj util completion bash)
 
 #======================================
-# bash apps
+# optional features
 #======================================
 
-source "$HOME/.config/shell/bash/bash-apps.sh"
+source "$__SHELL_DIR/bash/activate.sh"
 
-# bash-completion
-activate_bash_completion
+#======================================
+# clean
+#======================================
 
-# fish-like interactive behavior
-# activate_flyline
+unset __SHELL_DIR

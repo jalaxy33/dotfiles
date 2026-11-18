@@ -8,6 +8,11 @@
 alias vi='vim'
 alias nv='nvim'
 
+# ls shortcuts (ls is a function below)
+alias ll 'ls -l'
+alias la 'ls -A'
+alias l 'ls'
+
 # command abbrs
 abbr fa fastfetch
 abbr grub 'sudo grub-mkconfig -o /boot/grub/grub.cfg'
@@ -22,27 +27,16 @@ abbr poweroff "sudo systemctl poweroff"
 # history with timestamp
 abbr history 'history --show-time="%Y-%m-%d %H:%M:%S "'
 
-# configs shortcuts
-set BASH_CONFIG "$HOME/.bashrc"
-alias vibash="vi $BASH_CONFIG"
-alias nvbash="nv $BASH_CONFIG"
-alias hxbash="hx $BASH_CONFIG"
-alias catbash="cat $BASH_CONFIG"
-alias batbash="bat $BASH_CONFIG"
+# vibash/nvbash/hxbash/catbash/batbash open the config of NAME
+function _alias_config --argument-names __name __file
+    for tool in vi nv hx cat bat
+        alias "$tool$__name=$tool $__file"
+    end
+end
 
-set ZSH_CONFIG "$HOME/.zshrc"
-alias vizsh="vi $ZSH_CONFIG"
-alias nvzsh="nv $ZSH_CONFIG"
-alias hxzsh="hx $ZSH_CONFIG"
-alias catzsh="cat $ZSH_CONFIG"
-alias batzsh="bat $ZSH_CONFIG"
-
-set FISH_CONFIG "$HOME/.config/fish/config.fish"
-alias vifish="vi $FISH_CONFIG"
-alias nvfish="nv $FISH_CONFIG"
-alias hxfish="hx $FISH_CONFIG"
-alias catfish="cat $FISH_CONFIG"
-alias batfish="bat $FISH_CONFIG"
+_alias_config bash $HOME/.bashrc
+_alias_config zsh $HOME/.zshrc
+_alias_config fish $HOME/.config/fish/config.fish
 
 
 # ==========================================
@@ -90,10 +84,16 @@ end
 
 function y
     command -q yazi || return 1
-    set tmp (mktemp -t "yazi-cwd.XXXXXX")
-    command yazi $argv --cwd-file="$tmp"
-    if read -z cwd <"$tmp"; and [ "$cwd" != "$PWD" ]; and test -d "$cwd"
-        builtin cd -- "$cwd"
+    set __tmp (mktemp -t "yazi-cwd.XXXXXX")
+    command yazi $argv --cwd-file="$__tmp"
+    if read -z __cwd <"$__tmp"; and [ "$__cwd" != "$PWD" ]; and test -d "$__cwd"
+        builtin cd -- "$__cwd"
     end
-    rm -f -- "$tmp"
+    rm -f -- "$__tmp"
 end
+
+# ==========================================
+# clean
+# ==========================================
+
+functions -e _alias_config

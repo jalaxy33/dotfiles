@@ -1,7 +1,9 @@
+#!/usr/bin/env zsh
+#
 # keybinds.zsh -- zsh keybindings
 
 #
-# Set lazygit keybinding (crtl+g)
+# Set lazygit keybinding (ctrl+g)
 #
 function lazygit_widget() {
   lazygit
@@ -12,7 +14,7 @@ zle -N lazygit_widget
 bindkey '^g' lazygit_widget
 
 #
-# Set yazi keybinding (crtl+y)
+# Set yazi keybinding (ctrl+y)
 #
 function yazi_widget() {
   y
