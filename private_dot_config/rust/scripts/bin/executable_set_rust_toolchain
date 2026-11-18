@@ -1,21 +1,20 @@
 #!/usr/bin/env bash
 #
 # Select default rust toolchain
-#
 
 set -euo pipefail
 
-source "$HOME/.config/rust/scripts/helper-funcs.sh"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../_lib.sh" || exit 1
 
-# add current script folder to $env:PATH
-prepend_path "$(dirname ${BASH_SOURCE[0]})"
+# make the sibling scripts callable
+prepend_path "$SCRIPT_DIR"
 
 #======================================
 # CLI help info
 #======================================
 
 PROG="${0##*/}"
-VERSION="v0.1.0"
 
 usage() {
   cat <<EOF
@@ -34,95 +33,30 @@ EOF
 
 cli_base_args "$PROG" "$VERSION" usage "$@"
 
-TOOLCHAIN=""
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    -T | --toolchain)
-      if [[ -z ${2-} ]]; then
-        printf "error: %s needs a value (stable|nightly)\n" "$1" >&2
-        exit 1
-      fi
-      TOOLCHAIN="$2"
-      shift 2
-      ;;
-    --toolchain=*)
-      TOOLCHAIN="${1#*=}"
-      shift
-      ;;
-    *)
-      printf "error: unknown option: %s\n" "$1" >&2
-      exit 1
-      ;;
-  esac
-done
-
-require_valid_optional_cli_arg "-T, --toolchain" "$TOOLCHAIN" "stable" "nightly"
-
 #======================================
-# Helper funcs
+# Main
 #======================================
 
-# ask if use nightly
-# return "1" when choosing nightly, otherwise "0"
-ask_nightly() {
-  if command_exist rustup && [[ -n $(rustup toolchain list | grep nightly) ]]; then
-    confirm 'Use Nightly config?' && echo "1" || echo "0"
+main() {
+  local toolchain="" use_nightly="" channel=""
+
+  toolchain="$(parse_toolchain_flag "$@")"
+
+  printf '\n==== setup: default toolchain ====\n\n'
+  use_nightly="$(resolve_toolchain "$toolchain")"
+
+  if is_true "$use_nightly"; then
+    channel="nightly"
   else
-    echo "0"
+    channel="stable"
   fi
+
+  printf '\n[Running] rustup default %s\n\n' "$channel"
+  rustup default "$channel"
+
+  printf '\n==== generate: config files ====\n\n'
+  printf '[Running] setup_cargo --toolchain %s\n' "$channel"
+  setup_cargo --toolchain "$channel"
 }
 
-# Parse toolchain CLI argument.
-# Return "1" for nightly, "0" for stable.
-#
-# Usage:
-# $ parse_toolchain_arg $TOOLCHAIN
-parse_toolchain_arg() {
-  local toolchain="${1-}"
-
-  if ! isin "$toolchain" stable nightly; then
-    echo "[Error] invalid toolchain argument: '$toolchain'. (options: stable nightly)" >&2
-    exit 1
-  fi
-
-  # Verify nightly toolchain. Switch to stable if unavailable.
-  if [[ $toolchain == "nightly" ]]; then
-    is_nightly_toolchain_available && echo "1" || echo "0"
-  else
-    echo "0"
-  fi
-}
-
-#======================================
-# Main logics
-#======================================
-
-printf "\n==== setup: default toolchain ====\n\n"
-
-# make sure which toolchain to use
-if [[ -n $TOOLCHAIN ]]; then
-  # parse '--toolchain' argument if provided
-  USE_NIGHTLY=$(parse_toolchain_arg $TOOLCHAIN)
-else
-  # ask if use nightly toolchain
-  USE_NIGHTLY=$(ask_nightly)
-fi
-
-# set toolchain
-if is_true $USE_NIGHTLY; then
-  printf $'\n[Running] rustup default nightly\n\n'
-  rustup default nightly
-else
-  printf $'\n[Running] rustup default stable\n\n'
-  rustup default stable
-fi
-
-# setup configs
-printf "\n==== generate: config files ====\n"
-if is_true $USE_NIGHTLY; then
-  printf "\n[Running] setup_cargo --toolchain nightly\n"
-  setup_cargo --toolchain nightly
-else
-  printf "\n[Running] setup_cargo --toolchain stable\n"
-  setup_cargo --toolchain stable
-fi
+main "$@"

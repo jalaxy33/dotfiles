@@ -1,38 +1,19 @@
 #!/usr/bin/env bash
 #
-# Activate rustup toolchain
-# NOTE: Only works in POSIX compatible shell.
+# Put ~/.cargo/bin on PATH.
 #
+# This has to be sourced, a child process cannot change the caller's PATH:
+# $ source ~/.config/rust/scripts/bin/activate_rust
+#
+# (No 'set -euo pipefail' here: sourcing would change the caller's shell.)
 
-set -euo pipefail
-
-source "$HOME/.config/rust/scripts/helper-funcs.sh"
-
-#======================================
-# CLI help info
-#======================================
-
-PROG="${0##*/}"
-VERSION="v0.1.0"
-
-usage() {
-  cat <<EOF
-Activate rustup toolchain. 
-
-NOTE: Only works in POSIX compatible shell.
-
-Usage: $PROG [OPTIONS]
-
-META OPTIONS:
-  -h, --help      Print help
-  -v, --version   Print version
-EOF
-}
-
-cli_base_args "$PROG" "$VERSION" usage "$@"
-
-#======================================
-# Main logic
-#======================================
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../_lib.sh" || exit 1
 
 prepend_path "$HOME/.cargo/bin"
+
+# tell the user when this runs as a script instead of being sourced
+if [[ ${BASH_SOURCE[0]} == "$0" ]]; then
+  printf 'note: run this with "source" to change your PATH:\n' >&2
+  printf '      $ source %s\n' "${BASH_SOURCE[0]}" >&2
+fi

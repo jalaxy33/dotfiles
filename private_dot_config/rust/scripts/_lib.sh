@@ -1,10 +1,25 @@
-# helper bash functions
+# Shared bash library, sourced by the scripts in bin/.
+# Bash only ([[ ]], arrays, ${var,,}), not POSIX sh.
+
+# bash 3 has no arrays of the kind used below, and no ${var,,}: fail here
+# instead of further down with a confusing syntax error.
+if ((BASH_VERSINFO[0] < 4)); then
+  printf 'error: these scripts need bash 4+, found %s\n' "$BASH_VERSION" >&2
+  # 'return' works when sourced, 'exit' when this file runs on its own
+  return 1 2>/dev/null || exit 1
+fi
 
 # skip if loaded
-if [[ -n ${__RUST_HELPERS_LOADED:-} ]]; then
+if [[ -n ${__RUST_LIB_LOADED:-} ]]; then
   return 0
 fi
-readonly __RUST_HELPERS_LOADED=1
+readonly __RUST_LIB_LOADED=1
+
+# printed by --version, one place for the whole toolset
+VERSION="v0.1.0"
+
+# root of this toolset, i.e. ~/.config/rust
+RUST_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 
 #======================================
 # Bash env
@@ -101,17 +116,6 @@ cli_base_args() {
 # Check if the provided command-line argument valid.
 # Return 0 when valid, otherwise 1.
 #
-# Usage:
-# $ is_valid_cli_arg "$arg" opt1 opt2 ... || echo "invalid"
-is_valid_cli_arg() {
-  local value="$1" opt
-  shift
-  for opt in "$@"; do
-    [[ $opt == "$value" ]] && return 0
-  done
-  return 1
-}
-
 # Make sure given command-line argument is valid. Otherwise exit
 #
 # Usage:
@@ -122,8 +126,8 @@ require_valid_cli_arg() {
   local info="$1"
   local value="$2"
   shift 2
-  if ! is_valid_cli_arg "$value" "$@"; then
-    echo "[Error] Invalid argument for '$info', received '$value' (options: $@)" >&2
+  if ! isin "$value" "$@"; then
+    echo "[Error] Invalid argument for '$info', received '$value' (options: $*)" >&2
     exit 1
   fi
 }
@@ -140,7 +144,80 @@ require_valid_optional_cli_arg() {
   local value="$2"
   shift 2
   # skip checking if it is empty
-  is_blank $value && return 0 || require_valid_cli_arg "$info" "$value" "$@"
+  is_blank "$value" && return 0 || require_valid_cli_arg "$info" "$value" "$@"
+}
+
+#======================================
+# Rust toolchain
+#======================================
+
+# is_nightly_toolchain_available: true when rustup and a nightly toolchain exist.
+is_nightly_toolchain_available() {
+  command_exist rustup && rustup toolchain list 2>/dev/null | grep -q '^nightly'
+}
+
+# resolve_toolchain <stable|nightly|empty>: print "1" for nightly, "0" for stable.
+#
+# Empty means "ask", an explicit nightly without a nightly toolchain is an error:
+# asking may fall back, an explicit request must not.
+resolve_toolchain() {
+  local toolchain="${1-}"
+
+  if is_blank "$toolchain"; then
+    if is_nightly_toolchain_available && confirm 'Use Nightly toolchain?'; then
+      echo "1"
+    else
+      echo "0"
+    fi
+    return 0
+  fi
+
+  if ! isin "$toolchain" stable nightly; then
+    printf 'error: invalid toolchain: %s (options: stable nightly)\n' "$toolchain" >&2
+    exit 1
+  fi
+
+  [[ $toolchain == "stable" ]] && {
+    echo "0"
+    return 0
+  }
+
+  if ! is_nightly_toolchain_available; then
+    printf 'error: nightly toolchain is not installed\n' >&2
+    printf '       $ rustup toolchain install nightly\n' >&2
+    exit 1
+  fi
+  echo "1"
+}
+
+# parse_toolchain_flag [args...]: print the value of -T/--toolchain, or "".
+# Unknown options are an error, so pass only arguments this flag may see.
+parse_toolchain_flag() {
+  local value=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -T | --toolchain)
+        if [[ -z ${2-} ]]; then
+          printf 'error: %s needs a value (stable|nightly)\n' "$1" >&2
+          exit 1
+        fi
+        value="$2"
+        shift 2
+        ;;
+      --toolchain=*)
+        value="${1#*=}"
+        shift
+        ;;
+      *)
+        printf 'error: unknown option: %s\n' "$1" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  require_valid_optional_cli_arg "-T, --toolchain" "$value" stable nightly
+  printf '%s' "$value"
 }
 
 #======================================
@@ -172,6 +249,55 @@ read_trimmed() {
         /^[[:space:]]*$/ { if (started) blank++; next }
         { while (blank > 0) { print ""; blank-- } started = 1; print }
     ' "$file"
+}
+
+#======================================
+# Tagged blocks
+#======================================
+#
+# A template may carry optional parts between '#>>> <tag>' and '#<<<' lines,
+# e.g. nightly-only options. filter_blocks keeps the blocks named on its
+# command line and always drops the marker lines.
+
+# filter_blocks [tag...] < file: keep the named blocks, print the rest as is.
+# With no tags it keeps nothing, i.e. drops every block. Dropped blocks often
+# leave extra blank lines behind, so runs of blank lines are squeezed to one.
+filter_blocks() {
+  awk -v keep=" $* " '
+    /^#>>> /  { inside = 1; tag = $2; want = (index(keep, " " tag " ") > 0); next }
+    /^#<<<$/  { inside = 0; want = 0; next }
+              { if (inside && !want) next }
+              { if ($0 ~ /^[[:space:]]*$/) { if (blank) next; blank = 1 }
+                else blank = 0 }
+              { print }
+  '
+}
+
+# validate_blocks <file>: markers must be '#>>> <tag>' or '#<<<', and balanced.
+# A typo would otherwise leak nightly-only options into a stable file.
+validate_blocks() {
+  local file="$1" bad opens closes
+
+  bad=$(grep -nE '^#[<>]{2,}' "$file" | grep -vE ':(#>>> [a-z0-9_]+|#<<<)$') || true
+  if [[ -n $bad ]]; then
+    printf '[Error] bad block marker in %s:\n%s\n' "$file" "$bad" >&2
+    printf "        expected exactly '#>>> <tag>' or '#<<<'\n" >&2
+    exit 1
+  fi
+
+  opens=$(grep -cE '^#>>> [a-z0-9_]+$' "$file") || true
+  closes=$(grep -c '^#<<<$' "$file") || true
+  if [[ $opens -ne $closes ]]; then
+    printf '[Error] unbalanced blocks in %s: %s open, %s close\n' \
+      "$file" "$opens" "$closes" >&2
+    exit 1
+  fi
+}
+
+# block_keys <file> <tag>: print the TOML/rustfmt option names inside the blocks.
+block_keys() {
+  sed -n "/^#>>> $2$/,/^#<<<$/p" "$1" |
+    sed -n 's/^\([a-z_][a-z0-9_]*\)[[:space:]]*=.*/\1/p'
 }
 
 #======================================

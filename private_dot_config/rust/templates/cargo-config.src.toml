@@ -1,0 +1,115 @@
+# .cargo/config.toml - generated from templates/cargo-config.src.toml by `setup_cargo`
+#
+# Edit the source, not this copy: optional parts sit in '#>>> <tag>' blocks and
+# `setup_cargo` keeps only the ones you pick.
+#
+# Put this at one of:
+#     ~/.cargo/config.toml
+#     <project-root>/.cargo/config.toml
+#
+#   (For Windows: change ~ to `C:\Users\<user>` or `C:\Users\<user>\AppData\Roaming` )
+#
+#>>> nightly
+# This copy also needs the nightly toolchain:
+# $ rustup toolchain install nightly
+#<<<
+
+#>>> mirror_ustc
+#======================================
+# USTC mirror
+#======================================
+
+# https://mirrors.ustc.edu.cn/help/crates.io-index.html
+[source.crates-io]
+replace-with = 'ustc'
+
+[source.ustc]
+registry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
+
+[registries.ustc]
+index = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
+#<<<
+
+#>>> mirror_cernet
+#======================================
+# cernet mirror (mirrorZ)
+#======================================
+
+# https://help.mirrors.cernet.edu.cn/crates.io-index/
+[source.crates-io]
+replace-with = 'cernet'
+
+[source.cernet]
+registry = "sparse+https://mirrors.cernet.edu.cn/crates.io-index/"
+
+[registries.cernet]
+index = "sparse+https://mirrors.cernet.edu.cn/crates.io-index/"
+#<<<
+
+#======================================
+# target: linux
+#======================================
+
+# All rustflags sit in this one target table on purpose: cargo ignores
+# `[build] rustflags` completely as soon as a matching target table sets
+# `rustflags`, so the mold flag and the nightly flags have to share it.
+
+[target.'cfg(target_os = "linux")']
+
+#>>> mold
+# faster linker - `mold`
+#
+# Please install `clang` and `mold` first. For example:
+# $ sudo pacman -S mold clang     # archlinux
+linker = "clang"
+#<<<
+
+rustflags = [
+#>>> mold
+  "-C", "link-arg=-fuse-ld=mold",
+#<<<
+#>>> nightly
+  # (Nightly) parallel frontend threads
+  "-Zthreads=8",
+#<<<
+]
+
+#======================================
+# dev profile
+#======================================
+
+# Less debug info, much faster dev builds.
+#
+# These keys are set in the cargo config, so they win over the same keys in a
+# project's Cargo.toml.
+
+#>>> cranelift
+# A faster code generator (nightly only)
+#
+# Please install it by rustup first:
+# $ rustup component add rustc-codegen-cranelift-preview --toolchain nightly
+#
+# NOTE: the generated code may result in inconsistent behaviors. Please be careful.
+[unstable]
+codegen-backend = true
+#<<<
+
+[profile.dev]
+debug = "line-tables-only"
+#>>> cranelift
+# switch codegen-backend to cranelift (Nightly)
+codegen-backend = "cranelift"
+#<<<
+
+#>>> cranelift
+[profile.dev.package."*"]
+codegen-backend = "llvm"
+#<<<
+
+#======================================
+# lints
+#======================================
+
+# Warn about dependencies listed in Cargo.toml but never used.
+[lints.cargo]
+unused_dependencies = "warn"

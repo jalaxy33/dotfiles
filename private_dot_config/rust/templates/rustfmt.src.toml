@@ -1,32 +1,36 @@
-# rustfmt.toml - with unstable features
+# rustfmt.toml - generated from templates/rustfmt.src.toml by `setup_cargo`
 #
-# Most options require nightly toolchain.
-# 
+# Edit the source, not this copy. The '#>>> nightly' blocks hold options that
+# only work on nightly: a stable toolchain ignores them but prints one warning
+# per option, so the stable copy is generated without those blocks.
+#
 # Put this at one of:
 #     ~/rustfmt.toml                  (or  ~/.rustfmt.toml )
 #     ~/.config/rustfmt/rustfmt.toml  (or  ~/.config/rustfmt/.rustfmt.toml )
 #     <project-root>/rustfmt.toml     (or  <project-root>/.rustfmt.toml )
-# 
+#
 #   (For Windows: change ~ to `C:\Users\<user>` or `C:\Users\<user>\AppData\Roaming` )
 #
 # Run Formatting:
-# $ cargo +nightly fmt
-# 
+# $ cargo +nightly fmt     # project copy, unstable options included
+# $ cargo fmt              # stable copy, stable options only
+#
 # Check all format options:
 #     https://rust-lang.github.io/rustfmt/
 #
 
 style_edition = "2024"
-unstable_features = true
 
 #======================================
 # line/brace/space
 #======================================
 
 newline_style = "Unix"
-blank_lines_upper_bound=2
-spaces_around_ranges = true
 
+#>>> nightly
+blank_lines_upper_bound = 2
+spaces_around_ranges = true
+#<<<
 
 #======================================
 # struct
@@ -35,36 +39,36 @@ spaces_around_ranges = true
 # Foo {x:x, y:y}  ->  Foo {x, y}
 use_field_init_shorthand = true
 
+#>>> nightly
 # put `type` and `const` first, then macros and methods
 reorder_impl_items = true
-
+#<<<
 
 #======================================
 # macro
 #======================================
 
-format_macro_matchers = true
-
 # replace `try!` macro by the `?` shorthand
 use_try_shorthand = true
 
+#>>> nightly
+format_macro_matchers = true
+#<<<
 
+#>>> nightly
 #======================================
 # module import
 #======================================
 
 group_imports = "StdExternalCrate"
 # "Preserve", "Crate", "Module", "Item", "One"
-imports_granularity = "Module"
+imports_granularity = "Crate"
 
-#======================================
-# indent 
-#======================================
-#
 # Options: "Visual" or "Block" (default)
+imports_indent = "Visual"
+#<<<
 
-# imports_indent = "Visual"
-
+#>>> nightly
 #======================================
 # comments
 #======================================
@@ -77,12 +81,13 @@ normalize_doc_attributes = true
 #
 # wrap_comments = true
 # comment_width = 100
+#<<<
 
-
+#>>> nightly
 #======================================
 # trait
 #======================================
 
 # "Wide" (default) or "Compressed"
 type_punctuation_density = "Compressed"
-
+#<<<
