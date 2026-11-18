@@ -1,9 +1,4 @@
-# ~/.config/fish/conf.d/env.fish
-#
-# Setting environment variables for fish
-#
-
-set -q __CONFIG_DIR; or set -g __CONFIG_DIR "$HOME/.config/bash"
+# env.fish -- environment variables
 
 #======================================
 # apps

@@ -6,11 +6,6 @@
 [[ -n ${__ALIASES_SH_LOADED:-} ]] && return 0
 readonly __ALIASES_SH_LOADED=1
 
-[[ -n ${__CONFIG_DIR:-} ]] ||
-  __CONFIG_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd -P)
-
-source "$__CONFIG_DIR/paths.sh"
-
 # ==========================================
 # system commands
 # ==========================================

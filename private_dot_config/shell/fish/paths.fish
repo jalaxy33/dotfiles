@@ -1,11 +1,4 @@
 # paths.fish -- add directories to PATH
-#
-# aliases.fish sources this file early, so its `command -q` checks see the
-# extra PATH entries.
-set -q __PATHS_FISH_LOADED; and return
-set -g __PATHS_FISH_LOADED 1
-
-set -q __CONFIG_DIR; or set -g __CONFIG_DIR "$HOME/.config/bash"
 
 # ==========================================
 # OS Probe

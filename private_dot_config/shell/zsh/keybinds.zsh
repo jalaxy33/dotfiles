@@ -1,4 +1,4 @@
-# zsh_keybinds.zsh -- keybindings
+# keybinds.zsh -- zsh keybindings
 
 #
 # Set lazygit keybinding (crtl+g)

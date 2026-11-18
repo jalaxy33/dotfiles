@@ -6,13 +6,6 @@
 [[ -n ${__LANGUAGES_SH_LOADED:-} ]] && return 0
 readonly __LANGUAGES_SH_LOADED=1
 
-# directory of this file
-[[ -n ${__CONFIG_DIR:-} ]] ||
-  __CONFIG_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd -P)
-
-# prepend_path is a command in scripts/bin
-source "$__CONFIG_DIR/paths.sh"
-
 # ==========================================
 # Language Setup
 # ==========================================

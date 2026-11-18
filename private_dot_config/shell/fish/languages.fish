@@ -1,7 +1,4 @@
-# ~/.config/fish/conf.d/languages.fish
-#
-# languages related settings
-#
+# languages.fish -- languages related settings
 
 # rustup's own file: puts ~/.cargo/bin in PATH
 test -f "$HOME/.cargo/env.fish"; and source "$HOME/.cargo/env.fish"

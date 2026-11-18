@@ -1,24 +1,3 @@
-# ~/.config/fish/config.fish
-#
-# Softwares
-# Necessary:
-#  - fish, starship, vim(or gvim)
-#  - zoxide, fzf, eza, yazi, jq, ripgrep, fd
-#
-# Optional but useful:
-#  - bat, helix, rsync, neovim, fastfetch, lazygit
-#  - jujutsu, lazyjj
+# ~/.config/fish/config.fish 
 
-if status is-interactive
-    # Commands to run in interactive sessions can go here
-    set fish_greeting ""
-end
-
-# try to activate homebrew (if installed)
-command -q brew && eval (brew shellenv)
-
-# init apps
-command -q starship && starship init fish | source
-command -q zoxide && zoxide init fish --cmd cd | source
-command -q fzf && fzf --fish | source
-command -q jj && jj util completion fish | source
+source $HOME/.config/shell/fish/init.fish

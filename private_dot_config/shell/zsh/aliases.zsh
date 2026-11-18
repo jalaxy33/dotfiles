@@ -1,4 +1,4 @@
-# zsh_aliases.zsh -- command aliases
+# aliases.zsh -- zsh aliases
 
 # history with timestamp
 alias history='history -i'

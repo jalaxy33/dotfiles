@@ -1,4 +1,4 @@
-# zsh_functions.zsh -- zsh specific functions
+# zimfw.zsh -- zimfw setup: which script to use, activation, loaded check
 
 get_zimfw() {
   # decide which zimfw to use: system-wise or homebrew

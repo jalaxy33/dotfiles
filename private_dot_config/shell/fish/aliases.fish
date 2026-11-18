@@ -1,10 +1,4 @@
-# ~/.config/fish/conf.d/aliases.fish
-#
-# Command aliases
-#
-
-# so the `command -q` checks below see the full PATH
-source "$HOME/.config/fish/conf.d/paths.fish"
+# aliases.fish -- command aliases
 
 # ==========================================
 # aliases & abbrs
