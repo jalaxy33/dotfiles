@@ -3,38 +3,46 @@
 # languages.sh -- languages related settings
 #
 
-# skip if loaded
 [[ -n ${__LANGUAGES_SH_LOADED:-} ]] && return 0
 readonly __LANGUAGES_SH_LOADED=1
 
-# import helpers
-case ${ZSH_VERSION-} in
-  '') _src=${BASH_SOURCE:-$0} ;;   # bash
-  *)  _src=${(%):-%x} ;;           # zsh
-esac
-CURRENT_DIR=$(cd -- "$(dirname -- "$_src")" && pwd -P)
-unset _src
+# directory of this file
+[[ -n ${__CONFIG_DIR:-} ]] ||
+  __CONFIG_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd -P)
 
-source "$CURRENT_DIR/functions.sh"
+# prepend_path is a command in scripts/bin
+source "$__CONFIG_DIR/paths.sh"
 
 # ==========================================
 # Language Setup
 # ==========================================
 
-# rust
-try_source "$HOME/.cargo/env"
+# rustup's own file: puts ~/.cargo/bin in PATH
+[[ -f $HOME/.cargo/env ]] && source "$HOME/.cargo/env"
 
-# npm
-prepend_path "$HOME/.npm-global/bin"
-
-# pnpm
+# pnpm and bun want these exported, but only when they are installed
 PNPM_HOME="$HOME/.local/share/pnpm"
-[ -d $PNPM_HOME ] && export PNPM_HOME=$PNPM_HOME && prepend_path $PNPM_HOME
+[[ -d $PNPM_HOME ]] && export PNPM_HOME
 
-# bun
 BUN_BIN_DIR="$HOME/.bun/bin"
-[ -d $BUN_BIN_DIR ] && export BUN_BIN_DIR=$BUN_BIN_DIR && prepend_path $BUN_BIN_DIR
+[[ -d $BUN_BIN_DIR ]] && export BUN_BIN_DIR
 
-# haskell
-prepend_path "$HOME/.ghcup/bin"
-prepend_path "$HOME/.cabal/bin"
+# First entry wins; missing directories are skipped.
+__paths=(
+  # cabal first: ghcup may ship its own copy
+  "$HOME/.cabal/bin"
+
+  # ghcup
+  "$HOME/.ghcup/bin"
+
+  # bun
+  "$BUN_BIN_DIR"
+
+  # pnpm
+  "$PNPM_HOME"
+
+  # npm
+  "$HOME/.npm-global/bin"
+)
+
+eval "$(prepend_path "${__paths[@]}")"

@@ -67,7 +67,6 @@ else
   exit 1
 fi
 
-# check if helper commands exist
 ensure_command "$CURRENT_DIR/is_archlinux"
 ensure_command "$CURRENT_DIR/ensure-archlinuxcn"
 ensure_command "$SCRIPT_BINS/proxy_ok"

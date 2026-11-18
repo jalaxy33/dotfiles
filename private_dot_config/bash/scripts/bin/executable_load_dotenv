@@ -1,0 +1,193 @@
+#!/bin/sh
+#
+# load_dotenv - print shell code that loads a .env file
+#
+# A child cannot change its parent's environment, so this prints code:
+#
+#   bash/zsh:  eval "$(load_dotenv)"          # posix output is the default
+#   fish:      load_dotenv --shell fish | source
+#
+# stdout carries shell code only; --help and errors go to stderr.
+# Lines: KEY=VALUE, optional "export " prefix, optional single/double quotes
+# around the value, "#" comments, blank lines, leading UTF-8 BOM, CRLF.
+# Values are not expanded, so KEY="$HOME" stays literal.
+#
+set -eu
+
+PROG=load_dotenv
+
+# quoting helpers
+case $0 in
+  */*) __dir=${0%/*} ;;
+  *) __dir=. ;;
+esac
+. "$__dir/../_lib.sh"
+
+shell_target=posix
+no_override=false
+file=
+
+# ==========================================
+# CLI args
+# ==========================================
+
+show_usage() {
+  cat >&2 <<EOF
+Usage: load_dotenv [options] [FILE]
+
+Print shell code that sets the variables from FILE (default: ~/.env).
+Nothing is printed for invalid lines; they are reported on stderr.
+
+Options:
+  --shell SHELL    Output syntax: posix (default) or fish
+                   posix also accepts bash, zsh, sh
+  --no-override    Skip keys that already exist in the environment
+  -h, --help       Show this help
+
+Exit status:
+  0  all lines loaded (or skipped by --no-override)
+  1  FILE missing, or some lines were rejected
+  2  bad usage
+
+Examples:
+  eval "\$(load_dotenv)"
+  load_dotenv --shell fish | source
+  load_dotenv ~/.env.local --no-override
+EOF
+}
+
+while [ $# -gt 0 ]; do
+  case $1 in
+    -h | --help)
+      show_usage
+      exit 0
+      ;;
+    --shell)
+      [ $# -ge 2 ] || {
+        echo "$PROG: --shell needs a value" >&2
+        exit 2
+      }
+      shell_target=$2
+      shift 2
+      ;;
+    --shell=*)
+      shell_target=${1#--shell=}
+      shift
+      ;;
+    --no-override)
+      no_override=true
+      shift
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      echo "$PROG: unknown option: $1" >&2
+      exit 2
+      ;;
+    *)
+      [ -z "$file" ] || {
+        echo "$PROG: only one FILE can be given" >&2
+        exit 2
+      }
+      file=$1
+      shift
+      ;;
+  esac
+done
+
+[ $# -eq 0 ] || {
+  echo "$PROG: unexpected argument: $1" >&2
+  exit 2
+}
+
+set_shell_target "$shell_target"
+
+# ==========================================
+# File
+# ==========================================
+
+[ -n "$file" ] || file=${HOME:-/nonexistent}/.env
+
+if [ ! -f "$file" ]; then
+  echo "$PROG: $file not found" >&2
+  exit 1
+fi
+
+# ==========================================
+# Parse
+# ==========================================
+
+bom=$(printf '\357\273\277')
+has_error=0
+is_first=1
+
+while IFS= read -r line || [ -n "$line" ]; do
+  if [ "$is_first" = 1 ]; then
+    is_first=0
+    case $line in
+      "$bom"*) line=${line#"$bom"} ;;
+    esac
+  fi
+
+  line=${line#"${line%%[![:space:]]*}"}
+  line=${line%"${line##*[![:space:]]}"}
+
+  case $line in
+    '' | '#'*) continue ;;
+  esac
+
+  case $line in
+    export[[:space:]]*)
+      line=${line#export}
+      line=${line#"${line%%[![:space:]]*}"}
+      ;;
+  esac
+
+  case $line in
+    *=*) ;;
+    *)
+      echo "$PROG: skipping line without '=': $line" >&2
+      has_error=1
+      continue
+      ;;
+  esac
+
+  key=${line%%=*}
+  value=${line#*=}
+  key=${key#"${key%%[![:space:]]*}"}
+  key=${key%"${key##*[![:space:]]}"}
+
+  # Only plain identifiers: the key is written into code that gets evaluated.
+  case $key in
+    '' | [0-9]* | *[!A-Za-z0-9_]*)
+      echo "$PROG: skipping invalid key '$key'" >&2
+      has_error=1
+      continue
+      ;;
+  esac
+
+  case $value in
+    \'*\')
+      value=${value#?}
+      value=${value%?}
+      ;;
+    \"*\")
+      value=${value#?}
+      value=${value%?}
+      ;;
+  esac
+
+  # The environment we inherit is the caller's exported environment, so this
+  # sees the same keys the caller has.
+  if [ "$no_override" = true ]; then
+    if eval "[ -n \"\${$key+set}\" ]"; then
+      continue
+    fi
+  fi
+
+  emit_set "$key" "$value"
+done <"$file"
+
+exit "$has_error"

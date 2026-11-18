@@ -1,0 +1,120 @@
+#!/bin/sh
+#
+# prepend_path - print shell code that puts directories in front of PATH
+#
+# A child cannot change its parent's environment, so this prints code:
+#
+#   bash/zsh:  eval "$(prepend_path DIR...)"
+#   fish:      prepend_path --shell fish DIR... | source
+#
+# Argument order is kept, so the first one ends up first. Missing directories,
+# ones already in PATH, and ones containing ':' are skipped.
+#
+set -eu
+
+PROG=prepend_path
+
+# quoting helpers
+case $0 in
+  */*) __dir=${0%/*} ;;
+  *) __dir=. ;;
+esac
+. "$__dir/../_lib.sh"
+
+shell_target=posix
+
+# ==========================================
+# CLI args
+# ==========================================
+
+show_usage() {
+  cat >&2 <<EOF
+Usage: prepend_path [options] DIR...
+
+Print shell code that puts DIR... at the front of PATH, keeping their order.
+Nothing is printed when no directory is new.
+
+Options:
+  --shell SHELL    Output syntax: posix (default) or fish
+                   posix also accepts bash, zsh, sh
+  -h, --help       Show this help
+
+Exit status:
+  0  code printed, or nothing to add
+  2  bad usage
+
+Examples:
+  eval "\$(prepend_path ~/.local/bin)"                    # bash/zsh
+  prepend_path --shell fish ~/.local/bin | source         # fish
+EOF
+}
+
+while [ $# -gt 0 ]; do
+  case $1 in
+    -h | --help)
+      show_usage
+      exit 0
+      ;;
+    --shell)
+      [ $# -ge 2 ] || {
+        echo "$PROG: --shell needs a value" >&2
+        exit 2
+      }
+      shell_target=$2
+      shift 2
+      ;;
+    --shell=*)
+      shell_target=${1#--shell=}
+      shift
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      echo "$PROG: unknown option: $1" >&2
+      exit 2
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+set_shell_target "$shell_target"
+
+[ $# -gt 0 ] || exit 0
+
+# ==========================================
+# Work out what to add
+# ==========================================
+
+added=
+for dir in "$@"; do
+  [ -n "$dir" ] || continue
+  case $dir in
+    *:*)
+      echo "$PROG: skipping $dir (contains ':')" >&2
+      continue
+      ;;
+  esac
+  [ -d "$dir" ] || continue
+  # already in PATH, or already queued by an earlier argument
+  case ":$PATH:$added:" in
+    *":$dir:"*) continue ;;
+  esac
+  added=${added:+$added:}$dir
+done
+
+[ -n "$added" ] || exit 0
+
+# ==========================================
+# Emit
+# ==========================================
+
+# split $added back into arguments
+set -f
+_ifs=$IFS
+IFS=:
+emit_prepend PATH $added
+IFS=$_ifs

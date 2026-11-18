@@ -1,44 +1,43 @@
 #!/usr/bin/env bash
 #
-# paths.sh -- Add paths to $env:PATH
+# paths.sh -- add directories to PATH
 #
 
-# skip if loaded
 [[ -n ${__PATHS_SH_LOADED:-} ]] && return 0
 readonly __PATHS_SH_LOADED=1
 
-# import helpers
-case ${ZSH_VERSION-} in
-  '') _src=${BASH_SOURCE:-$0} ;;   # bash
-  *)  _src=${(%):-%x} ;;           # zsh
-esac
-CURRENT_DIR=$(cd -- "$(dirname -- "$_src")" && pwd -P)
-unset _src
+# directory of this file
+[[ -n ${__CONFIG_DIR:-} ]] ||
+  __CONFIG_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd -P)
 
-source "$CURRENT_DIR/functions.sh"
+# ==========================================
+# OS Probe
+# ==========================================
+
+__IS_ARCH=false
+"$__CONFIG_DIR/scripts/archbin/is_archlinux" && __IS_ARCH=true
 
 # ==========================================
 # Set Paths
 # ==========================================
 
-# add homebrew to PATH
-prepend_path "/home/linuxbrew/.linuxbrew/bin"
+# First entry wins; missing directories are skipped.
+__paths=(
+  # custom rust-related commands
+  "$HOME/.config/rust/scripts/bin"
 
-# add `~/.local/bin` to PATH
-prepend_path "$HOME/.local/bin"
+  # our own commands: clear_pi, rm_except, ...
+  "$__CONFIG_DIR/scripts/bin"
 
-# add custom executables to PATH: ./scripts/bin/
-SCRIPT_BINS="$CURRENT_DIR/scripts/bin"
-prepend_path $SCRIPT_BINS || echo "warning: $SCRIPT_BINS not exists"
+  # user-installed commands
+  "$HOME/.local/bin"
 
-# add custom rust-related commands
-RUST_SCRIPTS_BIN="$HOME/.config/rust/scripts/bin"
-prepend_path $RUST_SCRIPTS_BIN || echo "warning: $RUST_SCRIPTS_BIN not exists!"
+  # homebrew
+  "/home/linuxbrew/.linuxbrew/bin"
+)
 
-#
-# OS specific
-#---------------------------------
+# archlinux only: is_archlinux, ensure-*
+[[ $__IS_ARCH == true ]] && __paths+=("$__CONFIG_DIR/scripts/archbin")
 
-# archlinux specific: ./scripts/archbin/
-ARCHBINS="$CURRENT_DIR/scripts/archbin"
-$ARCHBINS/is_archlinux && prepend_path $ARCHBINS
+# scripts/bin is not on PATH yet, so use the full path here
+eval "$("$__CONFIG_DIR/scripts/bin/prepend_path" "${__paths[@]}")"

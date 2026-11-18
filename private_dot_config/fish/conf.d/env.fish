@@ -3,7 +3,7 @@
 # Setting environment variables for fish
 #
 
-set BASH_SCRIPTS "$HOME/.config/bash/scripts"
+set -q __CONFIG_DIR; or set -g __CONFIG_DIR "$HOME/.config/bash"
 
 #======================================
 # apps
@@ -43,19 +43,19 @@ set -x GOPROXY "https://mirrors.tencent.com/go/"
 #======================================
 
 # load ~/.env
-test -e ~/.env && load_dotenv
+if test -f ~/.env
+    load_dotenv --shell fish | source
+end
 
 
 #======================================
 # os-specific
 #======================================
 
-set ARCHBINS "$BASH_SCRIPTS/archbin"
-
-# libtorch
-if $ARCHBINS/is_archlinux; and test -d /opt/libtorch
-    set -x LIBTORCH "/opt/libtorch"
-    set -x LD_LIBRARY_PATH "$LIBTORCH/lib":$LD_LIBRARY_PATH
-    set -x LIBTORCH_BYPASS_VERSION_CHECK "1"
+if test "$__IS_ARCH" = true; and test -d /opt/libtorch # set in paths.fish
+    set -gx LIBTORCH "/opt/libtorch"
+    # LD_LIBRARY_PATH ends in PATH, so fish treats it as a list
+    set -gx LD_LIBRARY_PATH "$LIBTORCH/lib" $LD_LIBRARY_PATH
+    set -gx LIBTORCH_BYPASS_VERSION_CHECK "1"
 end
 

@@ -1,30 +1,36 @@
-# paths.fish -- Add paths to $env:PATH
+# paths.fish -- add directories to PATH
+#
+# aliases.fish sources this file early, so its `command -q` checks see the
+# extra PATH entries.
+set -q __PATHS_FISH_LOADED; and return
+set -g __PATHS_FISH_LOADED 1
 
-set BASH_SCRIPTS "$HOME/.config/bash/scripts"
+set -q __CONFIG_DIR; or set -g __CONFIG_DIR "$HOME/.config/bash"
+
+# ==========================================
+# OS Probe
+# ==========================================
+
+set -g __IS_ARCH false
+$__CONFIG_DIR/scripts/archbin/is_archlinux; and set -g __IS_ARCH true
 
 # ==========================================
 # Set Paths
 # ==========================================
 
-# add homebrew to PATH
-prepend_path "/home/linuxbrew/.linuxbrew/bin"
+# First entry wins; missing directories are skipped.
+set -g __paths \
+    # custom rust-related commands
+    $HOME/.config/rust/scripts/bin \
+    # our own commands: clear_pi, rm_except, ...
+    $__CONFIG_DIR/scripts/bin \
+    # user-installed commands
+    $HOME/.local/bin \
+    # homebrew
+    /home/linuxbrew/.linuxbrew/bin
 
-# add `~/.local/bin/` to PATH
-prepend_path "$HOME/.local/bin"
+# archlinux only: is_archlinux, ensure-*
+test "$__IS_ARCH" = true; and set -a __paths $__CONFIG_DIR/scripts/archbin
 
-# add custom executables to PATH: ~/.config/bash/scripts/bin/
-set SCIRPT_BINS "$BASH_SCRIPTS/bin"
-prepend_path $SCIRPT_BINS || echo "warning: $SCIRPT_BINS not exists!"
-
-# add custom rust-related commands
-set RUST_SCRIPTS_BIN "$HOME/.config/rust/scripts/bin"
-prepend_path "$RUST_SCRIPTS_BIN" || echo "warning: $RUST_SCRIPTS_BIN not exists!"
-
-#
-# OS specific
-#---------------------------------
-
-# archlinux specific
-set ARCHBINS "$BASH_SCRIPTS/archbin"
-$ARCHBINS/is_archlinux && prepend_path $ARCHBINS
-
+# scripts/bin is not on PATH yet, so use the full path here
+$__CONFIG_DIR/scripts/bin/prepend_path --shell fish $__paths | source

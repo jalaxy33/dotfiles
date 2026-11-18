@@ -21,7 +21,6 @@
 BASH_CONFIGS="$HOME/.config/bash"
 
 # Load configs in `$BASH_CONFIGS/`
-source "$BASH_CONFIGS/functions.sh"
 source "$BASH_CONFIGS/env.sh"
 source "$BASH_CONFIGS/aliases.sh"
 source "$BASH_CONFIGS/paths.sh"
@@ -32,13 +31,13 @@ source "$BASH_CONFIGS/languages.sh"
 #==========================================
 
 # try to activate homebrew (if installed)
-command_exists brew && eval "$(brew shellenv)"
+command -v brew >/dev/null && eval "$(brew shellenv)"
 
 # init apps
-command_exists starship && eval "$(starship init bash)"
-command_exists zoxide && eval "$(zoxide init bash --cmd cd)"
-command_exists fzf && eval "$(fzf --bash)"
-command_exists jj && source <(jj util completion bash)
+command -v starship >/dev/null && eval "$(starship init bash)"
+command -v zoxide >/dev/null && eval "$(zoxide init bash --cmd cd)"
+command -v fzf >/dev/null && eval "$(fzf --bash)"
+command -v jj >/dev/null && source <(jj util completion bash)
 
 #==========================================
 # Bash specific

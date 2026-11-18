@@ -1,29 +1,23 @@
 #!/usr/bin/env bash
 #
-# env.sh -- Setting environment variables for bash
+# env.sh -- environment variables
 #
 
-# skip if loaded
 [[ -n ${__ENV_SH_LOADED:-} ]] && return 0
 readonly __ENV_SH_LOADED=1
 
-# import helpers
-case ${ZSH_VERSION-} in
-  '') _src=${BASH_SOURCE:-$0} ;;   # bash
-  *)  _src=${(%):-%x} ;;           # zsh
-esac
-CURRENT_DIR=$(cd -- "$(dirname -- "$_src")" && pwd -P)
-unset _src
+# directory of this file
+[[ -n ${__CONFIG_DIR:-} ]] ||
+  __CONFIG_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd -P)
 
-source "$CURRENT_DIR/functions.sh"
-source "$CURRENT_DIR/paths.sh"
+source "$__CONFIG_DIR/paths.sh"
 
 #======================================
 # apps
 #======================================
 
 # manpage using $EDITOR
-if [ -n "$EDITOR" ] && [[ $EDITOR == *vim* || $EDITOR == *nv* ]]; then
+if [[ -n $EDITOR && ($EDITOR == *vim* || $EDITOR == *nv*) ]]; then
   export MANPAGER="sh -c '$EDITOR +Man!'"
 else
   unset MANPAGER
@@ -54,17 +48,16 @@ export GOPROXY="https://mirrors.tencent.com/go/"
 #======================================
 
 # load ~/.env
-[[ -f ~/.env ]] && load_dotenv
+if [[ -f ~/.env ]]; then
+  eval "$(load_dotenv)"
+fi
 
 #======================================
 # os-specific
 #======================================
 
-ARCHBINS="$CURRENT_DIR/scripts/archbin"
-
-# libtorch
-if $ARCHBINS/is_archlinux && [ -d /opt/libtorch ]; then
+if [[ $__IS_ARCH == true && -d /opt/libtorch ]]; then
   export LIBTORCH="/opt/libtorch"
-  export LD_LIBRARY_PATH="$LIBTORCH/lib":$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH="$LIBTORCH/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
   export LIBTORCH_BYPASS_VERSION_CHECK="1"
 fi

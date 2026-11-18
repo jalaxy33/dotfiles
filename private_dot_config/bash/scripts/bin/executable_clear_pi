@@ -55,14 +55,12 @@ ensure_command() {
   fi
 }
 
-# skip if ~/.pi not exists
 if [[ ! -d $PI_HOME ]]; then
   SCRIPT_NAME=$(basename -- "${BASH_SOURCE[0]}")
   echo "$SCRIPT_NAME: $PI_HOME not found! Skipped." >&2
   exit 1
 fi
 
-# check if helper commands exists
 ensure_command "$CURRENT_DIR/rm_except"
 
 # ==========================================

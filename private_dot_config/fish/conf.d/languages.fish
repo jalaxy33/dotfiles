@@ -3,28 +3,29 @@
 # languages related settings
 #
 
+# rustup's own file: puts ~/.cargo/bin in PATH
+test -f "$HOME/.cargo/env.fish"; and source "$HOME/.cargo/env.fish"
 
-# rust
-try_source "$HOME/.cargo/env.fish"
-
-# npm
-prepend_path "$HOME/.npm-global/bin"
-
-# pnpm
-set PNPM_HOME "$HOME/.local/share/pnpm"
-if test -d "$PNPM_HOME"
-    set -gx PNPM_HOME $PNPM_HOME
-    prepend_path $PNPM_HOME
+# pnpm and bun
+if test -d "$HOME/.local/share/pnpm"
+    set -gx PNPM_HOME "$HOME/.local/share/pnpm"
 end
 
-# bun
-set BUN_BIN_DIR "$HOME/.bun/bin"
-if test -d "$BUN_BIN_DIR"
-    set -gx BUN_BIN_DIR $BUN_BIN_DIR
-    prepend_path $BUN_BIN_DIR
+if test -d "$HOME/.bun/bin"
+    set -gx BUN_BIN_DIR "$HOME/.bun/bin"
 end
 
-# haskell
-prepend_path "$HOME/.ghcup/bin" 
-prepend_path "$HOME/.cabal/bin"
+# First entry wins; missing directories are skipped.
+set -g __paths \
+    # cabal first: ghcup may ship its own copy
+    $HOME/.cabal/bin \
+    # ghcup
+    $HOME/.ghcup/bin \
+    # bun
+    $BUN_BIN_DIR \
+    # pnpm
+    $PNPM_HOME \
+    # npm
+    $HOME/.npm-global/bin
 
+prepend_path --shell fish $__paths | source

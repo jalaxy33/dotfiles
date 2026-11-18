@@ -22,7 +22,6 @@ BASH_CONFIGS="$HOME/.config/bash"
 ZSH_CONFIGS="$HOME/.config/zsh"
 
 # Load configs in "$BASH_CONFIGS/"
-source "$BASH_CONFIGS/functions.sh"
 source "$BASH_CONFIGS/env.sh"
 source "$BASH_CONFIGS/aliases.sh"
 source "$BASH_CONFIGS/paths.sh"
@@ -38,7 +37,7 @@ source "$ZSH_CONFIGS/zsh_aliases.zsh"
 #==========================================
 
 # try to activate homebrew (if installed)
-command_exists brew && eval "$(brew shellenv)"
+command -v brew >/dev/null && eval "$(brew shellenv)"
 
 # uncomment to use zimfw
 activate_zimfw
@@ -49,10 +48,10 @@ if ! is_zimfw_loaded; then
   autoload -Uz compinit && compinit
 
   # starship is unnecessary when using zimfw
-  command_exists starship && eval "$(starship init zsh)"
+  command -v starship >/dev/null && eval "$(starship init zsh)"
 fi
 
 # init apps
-command_exists zoxide && eval "$(zoxide init zsh --cmd cd)"
-command_exists fzf && source <(fzf --zsh)
-command_exists jj && source <(jj util completion zsh)
+command -v zoxide >/dev/null && eval "$(zoxide init zsh --cmd cd)"
+command -v fzf >/dev/null && source <(fzf --zsh)
+command -v jj >/dev/null && source <(jj util completion zsh)

@@ -52,7 +52,6 @@ ensure_command() {
   fi
 }
 
-# check if helper commands exist
 ensure_command "$CURRENT_DIR/is_archlinux"
 
 # exit when not archlinux

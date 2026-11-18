@@ -3,6 +3,7 @@
 # Command aliases
 #
 
+# so the `command -q` checks below see the full PATH
 source "$HOME/.config/fish/conf.d/paths.fish"
 
 # ==========================================
@@ -85,7 +86,12 @@ end
 # ==========================================
 
 function ls
-    command -q eza && command eza --icons --git -a -g $argv
+    if command -q eza
+        # --icons=auto, not --icons: the bare form would eat a following path
+        command eza --icons=auto --git -a -g $argv
+    else
+        command ls --color=auto $argv
+    end
 end
 
 function y

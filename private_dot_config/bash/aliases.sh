@@ -3,37 +3,29 @@
 # aliases.sh -- command aliases
 #
 
-# skip if loaded
 [[ -n ${__ALIASES_SH_LOADED:-} ]] && return 0
 readonly __ALIASES_SH_LOADED=1
 
-# import helpers
-case ${ZSH_VERSION-} in
-  '') _src=${BASH_SOURCE:-$0} ;;   # bash
-  *)  _src=${(%):-%x} ;;           # zsh
-esac
-CURRENT_DIR=$(cd -- "$(dirname -- "$_src")" && pwd -P)
-unset _src
+[[ -n ${__CONFIG_DIR:-} ]] ||
+  __CONFIG_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd -P)
 
-source "$CURRENT_DIR/functions.sh"
-source "$CURRENT_DIR/paths.sh"
+source "$__CONFIG_DIR/paths.sh"
 
 # ==========================================
 # system commands
 # ==========================================
 
-# color support
-alias ls='ls --color=auto'
+# color support (ls is a function below)
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias dir='dir --color=auto'
 alias vdir='vdir --color=auto'
 
-# ls aliases
-alias ll='ls -alF'
+# ls aliases (no -F/-C: eza does not accept them)
+alias ll='ls -l'
 alias la='ls -A'
-alias l='ls -CF'
+alias l='ls'
 
 # ==========================================
 # aliases & abbrs
@@ -73,56 +65,57 @@ alias hxfish="hx $FISH_CONFIG"
 alias catfish="cat $FISH_CONFIG"
 alias batfish="bat $FISH_CONFIG"
 
-
 # ==========================================
 # command aliases
 # ==========================================
 
 # shortcuts for rsync
-if command_exists rsync; then
+if command -v rsync >/dev/null 2>&1; then
   alias rsyncp="rsync -alvhP"
 fi
 
 # task
-if command_exists go-task && ! command_exists task; then
+if command -v go-task >/dev/null 2>&1 && ! command -v task >/dev/null 2>&1; then
   alias task="go-task"
 fi
 
 # zed
-if command_exists zeditor && ! command_exists zed; then
+if command -v zeditor >/dev/null 2>&1 && ! command -v zed >/dev/null 2>&1; then
   alias zed='zeditor --classic'
 fi
 
 # helix
-if command_exists helix && ! command_exists hx; then
+if command -v helix >/dev/null 2>&1 && ! command -v hx >/dev/null 2>&1; then
   alias hx="helix"
 fi
 
 # chezmoi for niri dotfiles
-if command_exists chezmoi; then
+if command -v chezmoi >/dev/null 2>&1; then
   alias nirichezmoi="chezmoi -S $HOME/.local/share/chezmoi-niri/"
 fi
 
 # lazygit & lazyjj
-command_exists lazygit && alias lg="lazygit"
-command_exists lazyjj && alias lj="lazyjj"
+command -v lazygit >/dev/null 2>&1 && alias lg="lazygit"
+command -v lazyjj >/dev/null 2>&1 && alias lj="lazyjj"
 
 # ==========================================
 # alias functions
 # ==========================================
 
-function ls() {
-  command_exists eza && eza --icons --git -a -g "$@"
+ls() {
+  if command -v eza >/dev/null 2>&1; then
+    # --icons=auto, not --icons: the bare form would eat a following path
+    eza --icons=auto --git -a -g "$@"
+  else
+    command ls --color=auto "$@"
+  fi
 }
 
 y() {
-  command_exists yazi || return 1
+  command -v yazi >/dev/null 2>&1 || return 1
   local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
   command yazi "$@" --cwd-file="$tmp"
   IFS= read -r -d '' cwd <"$tmp"
   [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
   rm -f -- "$tmp"
 }
-
-
-

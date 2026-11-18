@@ -1,12 +1,6 @@
 # ~/.config/fish/config.fish
 #
-# ## File Structure
-# ~/.config/fish/
-# ├── conf.d/     # dir for auto-loaded configs
-# ├── functions/  # dir for functions
-# └── config.fish
-#
-# ## Softwares
+# Softwares
 # Necessary:
 #  - fish, starship, vim(or gvim)
 #  - zoxide, fzf, eza, yazi, jq, ripgrep, fd

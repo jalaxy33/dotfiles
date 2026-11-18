@@ -46,7 +46,6 @@ esac
 # ==========================================
 
 # Use the last status line: behind a proxy, curl also prints the CONNECT reply
-# Keep reason phrases in mind: both "HTTP/2 200" and "HTTP/1.1 200 OK" are ok
 status_line=$(curl -I -s -m "$TIMEOUT" "$TEST_URL" 2>/dev/null |
   awk '{sub(/[[:space:]]+$/, "")} /^HTTP\// {line = $0} END {print line}') || status_line=""
 
