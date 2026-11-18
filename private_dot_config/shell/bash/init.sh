@@ -47,10 +47,7 @@ command -v zoxide >/dev/null && eval "$(zoxide init bash --cmd cd)"
 command -v fzf >/dev/null && eval "$(fzf --bash)"
 command -v jj >/dev/null && source <(jj util completion bash)
 
-#======================================
-# optional features
-#======================================
-
+# bash-specific tools
 source "$__SHELL_DIR/bash/activate.sh"
 
 #======================================

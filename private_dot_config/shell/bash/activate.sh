@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# activate.sh -- turn on bash-completion and flyline
+# activate.sh -- activate bash-specific tools
 #
 
 __BREW_PREFIX="/home/linuxbrew/.linuxbrew"
