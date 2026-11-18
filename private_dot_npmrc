@@ -1,6 +1,4 @@
 registry=https://registry.npmmirror.com
 prefix=${HOME}/.npm-global
 allow-remote=all
-{{- if .npmToken }}
-//registry.npmjs.org/:_authToken={{ .npmToken }}
-{{- end }}
+//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}
