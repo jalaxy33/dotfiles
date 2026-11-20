@@ -9,14 +9,12 @@ if set -q EDITOR[1]; and string match -rq -- 'vim|nv' $EDITOR
     set -x MANPAGER "sh -c '$EDITOR +Man!'"
 end
 
-
 #======================================
 # mirrors
 #======================================
 
 # one file for both shells, so the lists cannot drift
 load_dotenv --shell fish (path resolve (status dirname)/..)/mirrors.env | source
-
 
 #======================================
 # .env

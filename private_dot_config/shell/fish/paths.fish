@@ -36,8 +36,8 @@ $__SHELL_DIR/scripts/bin/prepend_path --shell fish $__paths | source
 
 # libtorch, archlinux only
 if test "$__IS_ARCH" = true; and test -d /opt/libtorch
-    set -gx LIBTORCH "/opt/libtorch"
+    set -gx LIBTORCH /opt/libtorch
     # LD_LIBRARY_PATH ends in PATH, so fish treats it as a list
     set -gx LD_LIBRARY_PATH "$LIBTORCH/lib" $LD_LIBRARY_PATH
-    set -gx LIBTORCH_BYPASS_VERSION_CHECK "1"
+    set -gx LIBTORCH_BYPASS_VERSION_CHECK 1
 end

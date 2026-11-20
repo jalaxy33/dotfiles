@@ -73,9 +73,12 @@ if command -v helix >/dev/null 2>&1 && ! command -v hx >/dev/null 2>&1; then
   alias hx="helix"
 fi
 
-# chezmoi for niri dotfiles
+# chezmoi
 if command -v chezmoi >/dev/null 2>&1; then
-  alias nirichezmoi="chezmoi -S $HOME/.local/share/chezmoi-niri/"
+  alias cz="chezmoi"
+
+  # chezmoi for niri dotfiles
+  alias niricz="chezmoi -S $HOME/.local/share/chezmoi-niri/"
 fi
 
 # lazygit & lazyjj

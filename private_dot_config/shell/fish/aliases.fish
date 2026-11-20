@@ -11,7 +11,7 @@ alias nv='nvim'
 # ls shortcuts (ls is a function below)
 alias ll 'ls -l'
 alias la 'ls -A'
-alias l 'ls'
+alias l ls
 
 # command abbrs
 abbr fa fastfetch
@@ -38,7 +38,6 @@ _alias_config bash $HOME/.bashrc
 _alias_config zsh $HOME/.zshrc
 _alias_config fish $HOME/.config/fish/config.fish
 
-
 # ==========================================
 # command aliases
 # ==========================================
@@ -63,11 +62,13 @@ if command -q helix; and not command -q hx
     alias hx="helix"
 end
 
-# chezmoi for niri dotfiles
+# chezmoi
 if command -q chezmoi
-    alias nirichezmoi="chezmoi -S ~/.local/share/chezmoi-niri/"
-end
+    alias cz="chezmoi"
 
+    # chezmoi for niri dotfiles
+    alias niricz="chezmoi -S ~/.local/share/chezmoi-niri/"
+end
 
 # ==========================================
 # alias functions
