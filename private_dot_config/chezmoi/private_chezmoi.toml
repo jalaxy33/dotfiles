@@ -1,0 +1,10 @@
+[data]
+
+# Keep Zed's vim_mode/helix_mode off; for both add and re-add.
+[hooks.add.post]
+command = "sh"
+args = ["-c", "exec \"$HOME/.local/bin/zed-mode-off.sh\""]
+
+[hooks.re-add.post]
+command = "sh"
+args = ["-c", "exec \"$HOME/.local/bin/zed-mode-off.sh\""]
