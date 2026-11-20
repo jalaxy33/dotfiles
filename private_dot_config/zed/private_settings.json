@@ -9,56 +9,70 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-  // -- AI设置 --
-  // 是否全局禁用AI功能
-  "disable_ai": true,
-  // 添加自定义模型
-  "language_models": {
-    "opencode": {
-      "show_zen_models": false,
+  // ===========================
+  // 软件设置
+  // ===========================
+
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false,
+  },
+  "auto_update": false,
+  "cli_default_open_behavior": "new_window",
+
+  // ===========================
+  // 编辑器设置
+  // ===========================
+
+  // --- 代码编辑 ---
+
+  "tab_size": 2,
+
+  "diagnostics": {
+    "inline": {
+      "enabled": true,
     },
   },
-  // 设置自动补全模型
-  "edit_predictions": {
-    "mode": "subtle",
-    "provider": "open_ai_compatible_api",
-    "open_ai_compatible_api": {
-      "prompt_format": "deepseek_coder",
-      "model": "deepseek-flash",
-      "api_url": "https://api.deepseek.com/beta/completions",
-    },
+  "session": {
+    "trust_all_worktrees": true,
   },
-  // 设置外部agent ACP
-  "agent_servers": {
-    "pi-acp": {
-      "type": "registry",
-    },
+  "completion_menu_scrollbar": "auto",
+  "format_on_save": "off",
+
+  // --- vim/helix模式 ---
+
+  // vim_mode/helix_mode互斥
+  "vim_mode": false,
+  "helix_mode": true,
+
+  "vim": {
+    // 系统剪贴板选项对helix_mode无效
+    "use_system_clipboard": "always",
   },
-  // agent面板
-  "agent": {
-    "threads_sidebar": {
-      "position": "right",
-    },
-    "inline_assistant_model": {
-      "provider": "deepseek",
-      "model": "deepseek-v4-pro",
-      "enable_thinking": false,
-    },
-    "default_profile": "write",
-    "default_model": {
-      "effort": "high",
-      "provider": "deepseek",
-      "model": "deepseek-v4-pro",
-      "enable_thinking": true,
-    },
-    "show_turn_stats": true,
-    "notify_when_agent_waiting": "all_screens",
-    "dock": "right",
-    "favorite_models": [],
-    "model_parameters": [],
+  // which-key仅对helix_mode生效
+  "which_key": {
+    "delay_ms": 200,
+    "enabled": true,
   },
 
-  // -- 面板布局 --
+  // --- 外观&字体 ---
+
+  "colorize_brackets": true,
+  "ui_font_size": 17.0,
+  "buffer_font_size": 16.0,
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Zed (Default)",
+    "dark": "Colored Zed Icons Theme Dark",
+  },
+  "theme": {
+    "mode": "dark",
+    "light": "Gruvbox Light",
+    // 需要安装 `Github Theme` 插件
+    "dark": "GitHub Dark Dimmed",
+  },
+  // --- 面板布局 ---
+
   "debugger": {
     "dock": "left",
   },
@@ -97,75 +111,38 @@
     "show": "auto",
   },
 
-  // -- 编辑器 --
-  "vim_mode": false,
-  "helix_mode": true,
-  "which_key": {
-    "delay_ms": 100,
-    "enabled": true,
-  },
-  "diagnostics": {
-    "inline": {
-      "enabled": true,
+  // ===========================
+  // AI功能
+  // ===========================
+
+  // 是否全局禁用AI功能
+  "disable_ai": true,
+
+  // agent面板
+  "agent": {
+    "threads_sidebar": {
+      "position": "right",
     },
-  },
-  "session": {
-    "trust_all_worktrees": true,
-  },
-  "completion_menu_scrollbar": "auto",
-  "format_on_save": "off",
-  "colorize_brackets": true,
-  "ui_font_size": 17.0,
-  "buffer_font_size": 16.0,
-
-  // -- 软件设置 --
-  "telemetry": {
-    "diagnostics": false,
-    "metrics": false,
-  },
-  "auto_update": false,
-  "cli_default_open_behavior": "new_window",
-
-  // -- 外观主题 --
-  "icon_theme": {
-    "mode": "dark",
-    "light": "Zed (Default)",
-    "dark": "Colored Zed Icons Theme Dark",
-  },
-  "theme": {
-    "mode": "dark",
-    "light": "Gruvbox Light",
-    // 需要安装 `Github Theme` 插件
-    "dark": "GitHub Dark Dimmed",
+    "show_turn_stats": true,
+    "notify_when_agent_waiting": "all_screens",
+    "dock": "right",
   },
 
-  // -- 编程语言设置 --
+  // ===========================
+  // 编程语言与LSP设置
+  // ===========================
+
+  // 设置代码提示来源（LSP/treesitter/结合）
+  "semantic_tokens": "combined",
+
+  // 各语言特定设置
   "languages": {
-    "CSS": {
-      "tab_size": 3,
-      "language_servers": [
-        "tailwindcss-intellisense-css",
-        "!vscode-css-language-server",
-      ],
-    },
-    "HTML": {
-      "tab_size": 2,
-      "formatter": "language_server",
-    },
-    "Markdown-Inline": {
-      "tab_size": 2,
-    },
-    "Markdown": {
-      "tab_size": 2,
-    },
-    "Lua": {
-      "tab_size": 2,
-    },
-    "Shell Script": {
-      "tab_size": 2,
+    "TypeScript": {
+      "preferred_line_length": 90,
     },
   },
 
+  // lsp设置
   "lsp": {
     "rust-analyzer": {
       "initialization_options": {
@@ -186,26 +163,6 @@
         // Use `-p` instead of `--workspace` for cargo check
         "check": {
           "workspace": false,
-        },
-      },
-    },
-    "tailwindcss-language-server": {
-      "settings": {
-        "classFunctions": ["cva", "cx"],
-        "experimental": {
-          "classRegex": [
-            "class=\"([^\"]*)\"",
-            "[cls|className]\\s\\:\\=\\s\"([^\"]*)",
-            "\\.className\\s*[+]?=\\s*['\"]([^'\"]*)['\"]",
-            "\\.setAttributeNS\\(.*,\\s*['\"]class['\"],\\s*['\"]([^'\"]*)['\"]",
-            "\\.setAttribute\\(['\"]class['\"],\\s*['\"]([^'\"]*)['\"]",
-            "\\.classList\\.add\\(['\"]([^'\"]*)['\"]",
-            "\\.classList\\.remove\\(['\"]([^'\"]*)['\"]",
-            "\\.classList\\.toggle\\(['\"]([^'\"]*)['\"]",
-            "\\.classList\\.contains\\(['\"]([^'\"]*)['\"]",
-            "\\.classList\\.replace\\(\\s*['\"]([^'\"]*)['\"]",
-            "\\.classList\\.replace\\([^,)]+,\\s*['\"]([^'\"]*)['\"]",
-          ],
         },
       },
     },
