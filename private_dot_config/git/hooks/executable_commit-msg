@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+#
+# commit-msg -- require subjects to read "<scope>: <verb> <what changed>".
+#
+# Repo machinery (chezmoi config) never rides along with a tool change: when
+# both are staged, the scope has to be chezmoi. README, .chezmoiignore and
+# .chezmoiremove describe the files they belong to, so they follow any scope.
+# What the subject claims about the change itself is not checked here.
+#
+set -u
+
+subject=$(head -n 1 "$1")
+
+# Messages git writes itself.
+case $subject in
+Merge\ * | Revert\ * | fixup!\ * | squash!\ * | amend!\ *) exit 0 ;;
+esac
+
+if [[ ! $subject =~ ^[a-z0-9-]+:\ [a-z]+\ .+ ]]; then
+  echo "commit-msg: subject must read '<scope>: <verb> <what changed>', got '$subject'" >&2
+  exit 1
+fi
+
+if (( ${#subject} > 60 )); then
+  echo "commit-msg: subject is ${#subject} characters, keep it at 60 or less" >&2
+  exit 1
+fi
+
+scope=${subject%%:*}
+machinery=0
+tool_files=0
+while IFS= read -r path; do
+  case $path in
+  .chezmoi.toml* | .chezmoi.yaml* | private_dot_config/chezmoi/*) machinery=1 ;;
+  .chezmoiignore | .chezmoiremove | README.md) ;;
+  *) tool_files=1 ;;
+  esac
+done < <(git diff --cached --name-only)
+
+if (( machinery && tool_files )) && [[ $scope != chezmoi ]]; then
+  echo "commit-msg: chezmoi config staged with tool changes, use scope 'chezmoi'" >&2
+  exit 1
+fi
