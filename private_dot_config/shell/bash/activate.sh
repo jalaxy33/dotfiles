@@ -49,7 +49,8 @@ activate_flyline() {
 activate_bash_completion
 
 # fish-like interactive behavior
-# activate_flyline
+# set NO_FLYLINE=1 to skip it
+[[ -n $NO_FLYLINE ]] || activate_flyline
 
 #======================================
 # clean

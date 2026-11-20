@@ -15,4 +15,4 @@
 ## Optional
 
 `bat`, `helix`, `rsync`, `neovim`, `fastfetch`, `jujutsu`, `lazyjj`
-`lazygit` (zsh: Ctrl+G opens it)
+`lazygit`
