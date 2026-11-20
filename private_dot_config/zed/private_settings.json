@@ -26,6 +26,7 @@
 
   // --- 代码编辑 ---
 
+  // 默认缩进空格数
   "tab_size": 2,
 
   "diagnostics": {
@@ -43,7 +44,7 @@
 
   // vim_mode/helix_mode互斥
   "vim_mode": false,
-  "helix_mode": true,
+  "helix_mode": false,
 
   "vim": {
     // 系统剪贴板选项对helix_mode无效
@@ -137,6 +138,15 @@
 
   // 各语言特定设置
   "languages": {
+    "Python": {
+      "tab_size": 4
+    },
+    "Rust": {
+      "tab_size": 4
+    },
+    "Zig": {
+      "tab_size": 4
+    },
     "TypeScript": {
       "preferred_line_length": 90,
     },
