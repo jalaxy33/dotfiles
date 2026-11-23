@@ -1,0 +1,8 @@
+# ~/.config/git/config or ~/.gitconfig
+
+[push]
+	autoSetupRemote = true
+[credential]
+	helper = store
+[init]
+	defaultBranch = main
