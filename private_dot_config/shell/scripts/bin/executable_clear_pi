@@ -66,6 +66,7 @@ pi_keeps=(
   # folders
   "agent/"
   ".git/"
+  ".githooks/"
   # files
   ".gitignore"
   "README.md"
