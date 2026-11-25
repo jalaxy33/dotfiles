@@ -101,9 +101,23 @@ pi_agent_keeps=(
   "APPEND_SYSTEM.md"
   "AGENTS.md"
   # extension-related
-  "subagents.json"
-  "multimodal-proxy.json"
+  "intercom/"
   ".env"
+  "subagent.json"
+  "multimodal-proxy.json"
+  "web-search.json"
+  "tool-policy.json"
 )
 
 rm_except -D $pi_agent_dir "${pi_agent_keeps[@]}" -y
+
+#
+# Step 3 - clean extension specific
+#------------------------------------
+
+intercom_dir="$PI_HOME/agent/intercom"
+intercom_keeps=(
+  "config.json"
+)
+
+rm_except -D $intercom_dir "${intercom_keeps[@]}" -y
